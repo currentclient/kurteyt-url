@@ -29,7 +29,7 @@ class CRUDShortUrl(
     Methods to manage shorturls. Inherits from base crud to reuse common patterns.
     """
 
-    def get_shorturl(self, shorturl_in: str) -> models.ShortUrlInDB:
+    def get_shorturl(self, short_id: str) -> models.ShortUrlInDB:
         """
         Get shorturl
 
@@ -39,7 +39,7 @@ class CRUDShortUrl(
 
         """
 
-        shorturl_in_db = self.read_item_by_pk(partition=shorturl_in)
+        shorturl_in_db = self.read_item_by_pk(partition=short_id)
 
         return shorturl_in_db
 

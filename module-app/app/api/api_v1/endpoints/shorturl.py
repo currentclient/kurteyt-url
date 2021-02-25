@@ -10,11 +10,12 @@ from app.core.logger import get_logger
 from app.core.responses import common_400_and_500
 
 router = APIRouter()
+public = APIRouter()
 
 LOGGER = get_logger(__name__)
 
 
-@router.post(
+@public.post(
     "/",
     response_model=models.ShortUrl,
     responses=common_400_and_500,
@@ -49,18 +50,18 @@ def create_shorturl(
 )
 def read_shorturl(
     *,
-    short_url: str = Path(..., alias="id"),
+    short_id: str = Path(..., alias="id"),
 ) -> Any:
     """Get shorturl record"""
     LOGGER.debug(
         (
             "Function: read_shorturl |",
-            f"short_url: {short_url}",
+            f"short_id: {short_id}",
         )
     )
 
     # Get shorturl
-    shorturl_in_db = _get_shorturl(short_url=short_url)
+    shorturl_in_db = _get_shorturl(short_id=short_id)
 
     return shorturl_in_db
 
@@ -72,19 +73,19 @@ def read_shorturl(
 )
 def delete_shorturl(
     *,
-    short_url: str = Path(..., alias="id"),
+    short_id: str = Path(..., alias="id"),
 ) -> Any:
     """Delete shorturl record"""
 
     LOGGER.debug(
         (
             "Function: delete_shorturl |",
-            f"short_url: {short_url}",
+            f"short_id: {short_id}",
         )
     )
 
     # Get shorturl
-    shorturl_in_db = _get_shorturl(short_url=short_url)
+    shorturl_in_db = _get_shorturl(short_id=short_id)
 
     # Delete the shorturl
     try:
@@ -101,12 +102,12 @@ def delete_shorturl(
     return shorturl
 
 
-def _get_shorturl(short_url: str) -> models.ShortUrlInDB:
+def _get_shorturl(short_id: str) -> models.ShortUrlInDB:
     """Get shorturl"""
 
     try:
 
-        shorturl_in_db = crud.shorturl.get_shorturl(shorturl_in=short_url)
+        shorturl_in_db = crud.shorturl.get_shorturl(short_id=short_id)
 
         return shorturl_in_db
 

@@ -23,14 +23,14 @@ class ShortUrlBase(BaseModel):
     """
 
     TargetUrl: Optional[HttpUrl] = None
-    ShortUrl: Optional[str] = None
+    ShortId: Optional[str] = None
     NumDaysUntilExpire: Optional[int] = None
     TTL: Optional[int] = None
 
     @classmethod
-    def make_pk(cls, shorturl: str):
+    def make_pk(cls, short_id: str):
         """Make PK"""
-        return shorturl
+        return short_id
 
 
 class ShortUrlCreate(BaseModel):
@@ -72,9 +72,9 @@ class ShortUrlInDB(ShortUrlInDBBase):
     """
 
     TargetUrl: HttpUrl
-    ShortUrl: str
+    ShortId: str
     # Duplicating ids but adding dynamodb hash for access pattern readability
-    PK: str  # SHORTURL#ShortUrl
+    PK: str  # SHORTURL#ShortId
 
 
 # Properties to return to client (wired in on endpoint as response_model)
@@ -103,7 +103,7 @@ def convert_shorturlcreate_to_shorturlindb(
     """Convert ShortUrlCreate => ShortUrlInDB model"""
 
     # Generate unique url slug
-    short_url = random_alnum(size=8)
+    short_id = random_alnum(size=8)
 
     expire_datetime = datetime.datetime.today() + datetime.timedelta(
         days=create_model.NumDaysUntilExpire
@@ -117,11 +117,11 @@ def convert_shorturlcreate_to_shorturlindb(
         # Add shorturl create values
         **jsonable_encoder(create_model),
         # Add Ids
-        ShortUrl=short_url,
+        ShortId=short_id,
         TTL=expire_ttl,
         CreatedAt=current_timestamp,
         # Add pk and sk for dynamodb access patterns
-        PK=ShortUrlBase.make_pk(shorturl=short_url),
+        PK=ShortUrlBase.make_pk(short_id=short_id),
     )
 
     return indb_model

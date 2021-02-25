@@ -13,7 +13,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from mangum import Mangum
 from starlette.requests import Request
 
-from app.api.api_v1.api import api_router
+from app.api.api_v1.api import api_public_router, api_router
 from app.core.logger import get_logger
 from app.core.security import JWTBearer
 from app.core.settings import settings
@@ -59,8 +59,9 @@ if settings.BACKEND_CORS_ORIGINS:
     )
 
 # Set up routes
-# app.include_router(api_router, prefix=settings.API_V1_STR, dependencies=[Depends(auth)])
-app.include_router(api_router, prefix=settings.API_V1_STR)
+app.include_router(api_router, prefix=settings.API_V1_STR, dependencies=[Depends(auth)])
+# Include public router
+app.include_router(api_public_router, prefix=settings.API_V1_STR)
 
 
 # Set up health check

@@ -13,3 +13,4 @@ A url shortener using Fastapi on lambda, dynamodb, and cloudfront.
 - [Mangum (ASGI)](https://mangum.io/)
 - [Lamdba@edge for requests](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/lambda-generating-http-responses-in-requests.html)
 - [Lamdba@edge event structure](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/lambda-event-structure.html#example-viewer-request)
+- [Lamdba@edge example walkthrough](https://making.close.com/posts/redirects-using-cloudfront-lambda-edge)
