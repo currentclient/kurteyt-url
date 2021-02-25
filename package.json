@@ -10,7 +10,8 @@
     "up": "docker-compose up --build --remove-orphan",
     "box": "docker exec -it kurteyt-url_api_1 /bin/bash",
     "local:offline": "serverless offline",
-    "local": "uvicorn app.main:app --host 0.0.0.0 --port 8001 --reload"
+    "local": "uvicorn app.main:app --host 0.0.0.0 --port 8001 --reload",
+    "local:edge:redirect": "PYTHONPATH=module-edge poetry run serverless invoke local --path dox/edge/viewer-request.input.json --function edge --stage $1"
   },
   "author": "",
   "license": "ISC",

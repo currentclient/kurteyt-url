@@ -1,0 +1,88 @@
+{
+  "Records": [
+    {
+      "cf": {
+        "config": {
+          "distributionDomainName": "test.cloudfront.net",
+          "distributionId": "EDFDVBD6EXAMPLE",
+          "eventType": "origin-response",
+          "requestId": "avs=="
+        },
+        "request": {
+          "clientIp": "203.0.113.178",
+          "headers": {
+            "x-forwarded-for": [
+              {
+                "key": "X-Forwarded-For",
+                "value": "203.0.113.178"
+              }
+            ],
+            "user-agent": [
+              {
+                "key": "User-Agent",
+                "value": "Amazon CloudFront"
+              }
+            ],
+            "via": [
+              {
+                "key": "Via",
+                "value": "2.0 erf.cloudfront.net (CloudFront)"
+              }
+            ],
+            "host": [
+              {
+                "key": "Host",
+                "value": "example.org"
+              }
+            ],
+            "cache-control": [
+              {
+                "key": "Cache-Control",
+                "value": "no-cache, cf-no-cache"
+              }
+            ]
+          },
+          "method": "GET",
+          "origin": {
+            "custom": {
+              "customHeaders": {},
+              "domainName": "example.org",
+              "keepaliveTimeout": 5,
+              "path": "",
+              "port": 443,
+              "protocol": "https",
+              "readTimeout": 30,
+              "sslProtocols": ["TLSv1", "TLSv1.1", "TLSv1.2"]
+            }
+          },
+          "querystring": "",
+          "uri": "/lICAWhDO"
+        },
+        "response": {
+          "headers": {
+            "access-control-allow-credentials": [
+              {
+                "key": "Access-Control-Allow-Credentials",
+                "value": "true"
+              }
+            ],
+            "access-control-allow-origin": [
+              {
+                "key": "Access-Control-Allow-Origin",
+                "value": "*"
+              }
+            ],
+            "content-length": [
+              {
+                "key": "Content-Length",
+                "value": "9593"
+              }
+            ]
+          },
+          "status": "200",
+          "statusDescription": "OK"
+        }
+      }
+    }
+  ]
+}
