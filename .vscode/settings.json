@@ -1,0 +1,40 @@
+{
+  "workbench.colorCustomizations": {
+    "activityBar.activeBackground": "#36d278",
+    "activityBar.activeBorder": "#9663dc",
+    "activityBar.background": "#36d278",
+    "activityBar.foreground": "#15202b",
+    "activityBar.inactiveForeground": "#15202b99",
+    "activityBarBadge.background": "#9663dc",
+    "activityBarBadge.foreground": "#15202b",
+    "statusBar.background": "#27ae60",
+    "statusBar.foreground": "#e7e7e7",
+    "statusBarItem.hoverBackground": "#36d278",
+    "titleBar.activeBackground": "#27ae60",
+    "titleBar.activeForeground": "#e7e7e7",
+    "titleBar.inactiveBackground": "#27ae6099",
+    "titleBar.inactiveForeground": "#e7e7e799"
+  },
+  "peacock.color": "#27ae60",
+  "editor.formatOnSave": true,
+  "python.pythonPath": "/Users/dwbelliston/Library/Caches/pypoetry/virtualenvs/kurteyt-url-0QEJi09x-py3.8/bin/python",
+  "python.linting.enabled": true,
+  "python.linting.pylintEnabled": true,
+  "python.linting.pydocstyleEnabled": true,
+  // "python.sortImports.path": "/Users/dwbelliston/Library/Caches/pypoetry/virtualenvs/kurteyt-url-3Bu9Hurk-py3.8/bin/isort",
+  "python.languageServer": "Pylance",
+  "[python]": {
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": true
+    }
+  },
+  "python.formatting.provider": "black",
+  "python.sortImports.args": ["--src=${workspaceFolder}/module-app"],
+  "python.analysis.extraPaths": [
+    "module-app",
+    "module-bus",
+    "module-plops",
+    "module-stream",
+    "module-dispatches"
+  ]
+}

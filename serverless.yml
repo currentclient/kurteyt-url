@@ -1,0 +1,170 @@
+# Name of the service
+service: kurteyt-url
+
+# Pin framework version
+frameworkVersion: ">=2.0.0"
+
+plugins:
+  - serverless-python-requirements
+  - serverless-pseudo-parameters
+  - serverless-iam-roles-per-function
+  - serverless-dotenv-plugin
+  # - serverless-dynamodb-local
+
+# Custom variables, try to put config variable names here, for easy reference
+custom:
+  # Naming conventions helpers
+  naming:
+    regionTranslation:
+      us-west-2: west
+    # Prefix for the org
+    org: cc
+    region: ${self:custom.naming.regionTranslation.${self:provider.region}}
+    prefix: ${self:custom.naming.org}-${self:custom.naming.region}-${self:provider.stage} # cc-west-dev
+    prefixParm: /${self:custom.naming.org}/${self:custom.naming.region}/${self:provider.stage} # /cc/west/dev
+    type:
+      stack: ${self:custom.naming.prefix}-stack
+      api: ${self:custom.naming.prefix}-api
+      lambda: ${self:custom.naming.prefix}-lambda
+      role: ${self:custom.naming.prefix}-role
+      db: ${self:custom.naming.prefix}-db
+    use:
+      # Name of the cloudformation stack
+      stackName: ${self:custom.naming.type.stack}-kurteyt
+      # Name of the api
+      apiName: ${self:custom.naming.type.api}-kurteyt
+      # Name of the lambda
+      lambdaNameKurteytApi: ${self:custom.naming.type.lambda}-kurteyt-api
+      lambdaRoleKurteytApi: ${self:custom.naming.type.role}-kurteyt-api
+      lambdaNameKurteytOrigin: ${self:custom.naming.type.lambda}-kurteyt-origin
+      lambdaRoleKurteytOrigin: ${self:custom.naming.type.role}-kurteyt-origin
+      # Name of the table
+      tableNameKurteyt: ${self:custom.naming.type.db}-kurteyt
+      # User pool endpoint
+      cognitoUserPoolId: ${env:USERPOOL_ID}
+      cognitoUserPoolUrl: "https://cognito-idp.${self:provider.region}.amazonaws.com/${env:USERPOOL_ID}"
+      cognitoUserPoolClient: ${env:COGNITOUSERPOOLCLIENT}
+      domainName: ${env:DOMAIN_NAME}
+  # Plugin options
+  # serverless-iam-roles-per-function:
+  #   defaultInherit: true
+  pythonRequirements:
+    # Not going to use poetry, will manage the requirements file for each seperate
+    # function
+    usePoetry: false
+    slim: true
+    # Will default to using the app requirements. This allows the app function to be
+    # packaged without using the 'module' property, which when used, removes the folder
+    # app, so it doesnt play nice.
+    # fileName: app/requirements.txt
+  serverless-offline:
+    noPrependStageInUrl: true
+    ignoreJWTSignature: true
+    # noAuth: true
+    httpPort: 8001
+
+provider:
+  name: aws
+  region: ${opt:region, 'us-west-2'}
+  stage: ${opt:stage, 'dev'}
+  stackName: ${self:custom.naming.use.stackName}
+  stackTags: ${file(./tags.yml)}
+  runtime: python3.8
+  timeout: 26 # HTTP api timeout is 29s
+  memorySize: 128
+  versionFunctions: false
+  logs:
+    httpApi: true
+  tracing:
+    apiGateway: true
+    lambda: true
+  httpApi:
+    cors:
+      allowedOrigins:
+        - http://localhost:8000
+        - http://0.0.0.0:8000
+        - https://demo.currentclient.io
+      allowedHeaders:
+        - Content-Type
+        - Authorization
+        - Content-Type
+        - X-Amz-Date
+        - Authorization
+        - X-Api-Key
+        - X-Amz-Security-Token
+        - X-Amz-User-Agent
+      allowCredentials: true
+    # Use custom name for the API Gateway API
+    name: ${self:custom.naming.use.apiName}
+    payload: "2.0"
+    # cors: true # Implies default behavior, can be fine tuned with specficic options
+    # authorizers:
+    #   # JWT authorizers to back HTTP API endpoints
+    #   cognitoJwtAuthorizer:
+    #     # Point request header at which JWT token will be provided
+    #     identitySource: $request.header.Authorization
+    #     # Issuer url, in case of Cognito User Pools url will be like:
+    #     # https://cognito-idp.${region}.amazonaws.com/${cognitoPoolId}
+    #     issuerUrl: ${self:custom.naming.use.cognitoUserPoolUrl}
+    #     # Audience for which access is intended
+    #     # In case of Cognito User Pools we need to list client ids
+    #     audience:
+    #       - "${self:custom.naming.use.cognitoUserPoolClient}"
+  environment:
+    LOG_AT_LEVEL: DEBUG
+    KURTEYT_TABLE: ${self:custom.naming.use.tableNameKurteyt}
+    USERPOOL_ID: "${self:custom.naming.use.cognitoUserPoolId}"
+    USERCLIENT_ID: "${self:custom.naming.use.cognitoUserPoolClient}"
+
+package:
+  individually: true
+  # exclude:
+  #   - "*/**"
+  #   - "*"
+
+functions:
+  app:
+    name: ${self:custom.naming.use.lambdaNameKurteytApi}
+    description: kurteyts url api
+    memorySize: 512
+    handler: app.main.handler
+    module: module-app
+    iamRoleStatementsName: ${self:custom.naming.use.lambdaRoleKurteytApi}
+    iamRoleStatementsInherit: true
+    iamRoleStatements:
+      - Sid: "AllowKurteytTableCRUD"
+        Effect: "Allow"
+        Action:
+          - "dynamodb:BatchGetItem"
+          - "dynamodb:GetItem"
+          - "dynamodb:Query"
+          - "dynamodb:Scan"
+          - "dynamodb:BatchWriteItem"
+          - "dynamodb:PutItem"
+          - "dynamodb:UpdateItem"
+          - "dynamodb:DeleteItem"
+        Resource:
+          - !GetAtt KurteytTable.Arn
+    events:
+      # Priority 1 - Allow CORS options calls
+      - httpApi:
+          path: /api/v1/{proxy+}
+          method: "OPTIONS"
+      # Priority 2 - Authenticated Routes to api
+      # - httpApi:
+      #     path: /api/{proxy+}
+      #     method: "*"
+      #     authorizer:
+      #       name: cognitoJwtAuthorizer
+      #       scopes: # Optional
+      #         - aws.cognito.signin.user.admin
+      # Priority 3 - Allow top level GETS
+      - httpApi:
+          path: /{proxy+}
+          method: "GET"
+
+          # Resources
+resources:
+  - ${file(infra/table.yaml)}
+  - ${file(infra/domain.yaml)}
+  - ${file(infra/outputs.yaml)}

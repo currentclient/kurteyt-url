@@ -1,0 +1,53 @@
+#############################################################################
+## Group: Database
+#### Use: Database for microservice
+####      - Table for kurteyts
+#############################################################################
+
+Resources:
+  KurteytTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: PK
+          AttributeType: S
+      BillingMode: PAY_PER_REQUEST # default is PROVISIONED
+      # GlobalSecondaryIndexes:
+      #   - GlobalSecondaryIndex
+      KeySchema:
+        - AttributeName: PK
+          KeyType: HASH
+      # LocalSecondaryIndexes:
+      #   - LocalSecondaryIndex
+      # PointInTimeRecoverySpecification:
+      #   PointInTimeRecoverySpecification
+      # ProvisionedThroughput:
+      #   ReadCapacityUnits: 1
+      #   WriteCapacityUnits: 1
+      # SSESpecification:
+      #   SSESpecification
+      # StreamSpecification:
+      #   StreamViewType: NEW_IMAGE # NEW_AND_OLD_IMAGES
+      TableName: ${self:custom.naming.use.tableNameKurteyt}
+      # Tags:
+      #   - Tag
+      TimeToLiveSpecification:
+        AttributeName: TTL
+        Enabled: True
+
+  # StreamIntegration:
+  #   Type: AWS::Lambda::EventSourceMapping
+  #   DependsOn: !Ref StreamLambdaFunction
+  #   Properties:
+  #     BatchSize: 1
+  #     # BisectBatchOnFunctionError: Boolean
+  #     # DestinationConfig:
+  #     #   DestinationConfig
+  #     Enabled: True
+  #     EventSourceArn: !GetAtt KurteytTable.StreamArn
+  #     FunctionName: ${self:custom.naming.use.lambdaNameStream}
+  #     # MaximumBatchingWindowInSeconds: Integer
+  #     # MaximumRecordAgeInSeconds: Integer
+  #     # MaximumRetryAttempts: Integer
+  #     ParallelizationFactor: 1
+  #     StartingPosition: LATEST

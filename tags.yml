@@ -1,0 +1,5 @@
+app:name: kurteyt-url
+app:type: api
+app:description: url shortener api
+env:name: ${self:provider.stage}
+code:repo: kurteyt-url

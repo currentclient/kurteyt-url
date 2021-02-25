@@ -1,0 +1,4 @@
+Outputs:
+  KurteytTableArn:
+    Description: The ARN for the Kurteyt's Table
+    Value: !GetAtt KurteytTable.Arn

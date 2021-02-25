@@ -1,0 +1,42 @@
+Resources:
+  # ---------------------------------------------------------------------------
+  # Domain on api
+  # ---------------------------------------------------------------------------
+
+  ApiDomainName:
+    Type: AWS::ApiGatewayV2::DomainName
+    Properties:
+      DomainName: ${self:custom.naming.use.domainName}
+      DomainNameConfigurations:
+        - EndpointType: REGIONAL
+          CertificateArn: !Ref ApiDomainCert
+          # CertificateName: customer
+      # MutualTlsAuthentication:
+      #   MutualTlsAuthentication
+      # Tags: Json
+
+  ApiMapping:
+    Type: AWS::ApiGatewayV2::ApiMapping
+    Properties:
+      ApiId: !Ref HttpApi
+      # ApiMappingKey: String
+      DomainName: !Ref ApiDomainName
+      Stage: !Ref HttpApiStage
+
+  # ---------------------------------------------------------------------------
+  # ACM cert
+  # ---------------------------------------------------------------------------
+  ApiDomainCert:
+    Type: AWS::CertificateManager::Certificate
+    Properties:
+      # CertificateAuthorityArn: String
+      # CertificateTransparencyLoggingPreference: String
+      DomainName: ${self:custom.naming.use.domainName}
+      # DomainValidationOptions:
+      #   - DomainValidationOption
+      SubjectAlternativeNames:
+        - "*.${self:custom.naming.use.domainName}"
+        - "*.api.${self:custom.naming.region}.${self:custom.naming.use.domainName}"
+      # Tags:
+      #   - Tag
+      ValidationMethod: DNS
