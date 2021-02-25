@@ -1,0 +1,138 @@
+#############################################################################
+## Group: Cloudfront
+#### Use: Cloudfront with lamdba @edge definition for url shortening
+####      - Cloudfront distribution
+#############################################################################
+
+Resources:
+  # ---------------------------------------------------------------------------
+  # Lambda edge role
+  # ---------------------------------------------------------------------------
+  CloudfrontEdgeFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: ${self:custom.naming.use.lambdaRoleKurteytEdge}
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+                - edgelambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: AllowLogs
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource:
+                  - !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${self:custom.naming.use.lambdaNameKurteytEdge}:*:*"
+        - PolicyName: AllowKurteytTableCRUD
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "dynamodb:GetItem"
+                  - "dynamodb:PutItem"
+                  - "dynamodb:UpdateItem"
+                Resource:
+                  - !GetAtt KurteytTable.Arn
+
+  # ---------------------------------------------------------------------------
+  # Lambda edge version for cloudfront
+  # ---------------------------------------------------------------------------
+  CloudfrontEdgeFunctionVersion:
+    Type: AWS::Lambda::Version
+    Properties:
+      # CodeSha256: String
+      Description: "version for lambda at edge"
+      FunctionName: !Ref EdgeLambdaFunction
+      # ProvisionedConcurrencyConfig:
+      #   ProvisionedConcurrencyConfiguration
+
+  # ---------------------------------------------------------------------------
+  # CloudFront Distribution
+  # ---------------------------------------------------------------------------
+  CloudFrontDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Aliases:
+          - ${self:custom.naming.use.domainName}
+        # CacheBehaviors:
+        #   - CacheBehavior
+        # Comment: String
+        # CustomErrorResponses:
+        #   - ErrorCachingMinTTL: Double
+        #     ErrorCode: Integer
+        #     ResponseCode: Integer
+        #     ResponsePagePath: String
+        DefaultCacheBehavior:
+          AllowedMethods:
+            - GET
+            - HEAD
+          CachedMethods:
+            - GET
+            - HEAD
+          # https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/using-managed-cache-policies.html
+          CachePolicyId: b2884449-e4de-46a7-ac36-70bc7f1ddd6d
+          # Compress: Boolean
+          MaxTTL: 60
+          MinTTL: 0
+          LambdaFunctionAssociations:
+            - EventType: viewer-request
+              LambdaFunctionARN: !Ref CloudfrontEdgeFunctionVersion
+          # OriginRequestPolicyId: String
+          # RealtimeLogConfigArn: String
+          # SmoothStreaming: Boolean
+          TargetOriginId:
+            Fn::Sub: API-root
+          # TrustedKeyGroups:
+          #   - String
+          # TrustedSigners:
+          #   - String
+          ViewerProtocolPolicy: redirect-to-https
+        # DefaultRootObject: String
+        Enabled: true
+        HttpVersion: http2
+        IPV6Enabled: true
+        # Logging:
+        #   Bucket: !GetAtt S3BucketLogs.DomainName
+        #   IncludeCookies: false
+        #   Prefix: cdn/
+        # OriginGroups:
+        #   OriginGroups
+        Origins:
+          - ConnectionAttempts: 3
+            ConnectionTimeout: 10
+            CustomOriginConfig:
+              # HTTPPort: Integer
+              HTTPSPort: 443
+              # OriginKeepaliveTimeout: 5 # 5 seconds default
+              OriginProtocolPolicy: https-only
+              OriginReadTimeout: 15 # 30 seconds default
+              OriginSSLProtocols:
+                - TLSv1.2
+            DomainName: ${self:custom.naming.use.domainNameApi}
+            Id:
+              Fn::Sub: API-root
+            # OriginCustomHeaders:
+            #   - OriginCustomHeader
+            # OriginPath: String
+            # OriginShield: OriginShield
+            # S3OriginConfig: S3OriginConfig
+        PriceClass: PriceClass_All
+        # Restrictions:
+        #   Restrictions
+        ViewerCertificate:
+          AcmCertificateArn: !Ref DomainCert
+          MinimumProtocolVersion: TLSv1.1_2016
+          SslSupportMethod: sni-only
+        # WebACLId: String

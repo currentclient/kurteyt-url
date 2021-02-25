@@ -23,10 +23,10 @@ LOGGER = get_logger(__name__)
 def create_shorturl(
     *,
     shorturl_in: models.ShortUrlCreate,
-    current_user: models.User = Depends(deps.get_current_active_user),
+    # current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """Create shorturl record"""
-    LOGGER.debug(f"Function: create_shorturl | current_user: {current_user.user_id}")
+    LOGGER.debug("Function: create_shorturl")
 
     try:
 

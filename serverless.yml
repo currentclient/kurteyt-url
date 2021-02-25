@@ -16,7 +16,7 @@ custom:
   # Naming conventions helpers
   naming:
     regionTranslation:
-      us-west-2: west
+      us-east-1: east
     # Prefix for the org
     org: cc
     region: ${self:custom.naming.regionTranslation.${self:provider.region}}
@@ -36,16 +36,21 @@ custom:
       # Name of the lambda
       lambdaNameKurteytApi: ${self:custom.naming.type.lambda}-kurteyt-api
       lambdaRoleKurteytApi: ${self:custom.naming.type.role}-kurteyt-api
-      lambdaNameKurteytOrigin: ${self:custom.naming.type.lambda}-kurteyt-origin
-      lambdaRoleKurteytOrigin: ${self:custom.naming.type.role}-kurteyt-origin
+      lambdaNameKurteytEdge: ${self:custom.naming.type.lambda}-kurteyt-edge
+      lambdaRoleKurteytEdge: ${self:custom.naming.type.role}-kurteyt-edge
       # Name of the table
       tableNameKurteyt: ${self:custom.naming.type.db}-kurteyt
       # User pool endpoint
       cognitoUserPoolId: ${env:USERPOOL_ID}
-      cognitoUserPoolUrl: "https://cognito-idp.${self:provider.region}.amazonaws.com/${env:USERPOOL_ID}"
+      cognitoUserPoolUrl: ${env:USERPOOL_URL}
       cognitoUserPoolClient: ${env:COGNITOUSERPOOLCLIENT}
       domainName: ${env:DOMAIN_NAME}
+      domainNameApi: api.${env:DOMAIN_NAME}
   # Plugin options
+  dotenv:
+    # default: project root
+    include:
+      - []
   # serverless-iam-roles-per-function:
   #   defaultInherit: true
   pythonRequirements:
@@ -65,7 +70,7 @@ custom:
 
 provider:
   name: aws
-  region: ${opt:region, 'us-west-2'}
+  region: "us-east-1"
   stage: ${opt:stage, 'dev'}
   stackName: ${self:custom.naming.use.stackName}
   stackTags: ${file(./tags.yml)}
@@ -97,24 +102,6 @@ provider:
     # Use custom name for the API Gateway API
     name: ${self:custom.naming.use.apiName}
     payload: "2.0"
-    # cors: true # Implies default behavior, can be fine tuned with specficic options
-    # authorizers:
-    #   # JWT authorizers to back HTTP API endpoints
-    #   cognitoJwtAuthorizer:
-    #     # Point request header at which JWT token will be provided
-    #     identitySource: $request.header.Authorization
-    #     # Issuer url, in case of Cognito User Pools url will be like:
-    #     # https://cognito-idp.${region}.amazonaws.com/${cognitoPoolId}
-    #     issuerUrl: ${self:custom.naming.use.cognitoUserPoolUrl}
-    #     # Audience for which access is intended
-    #     # In case of Cognito User Pools we need to list client ids
-    #     audience:
-    #       - "${self:custom.naming.use.cognitoUserPoolClient}"
-  environment:
-    LOG_AT_LEVEL: DEBUG
-    KURTEYT_TABLE: ${self:custom.naming.use.tableNameKurteyt}
-    USERPOOL_ID: "${self:custom.naming.use.cognitoUserPoolId}"
-    USERCLIENT_ID: "${self:custom.naming.use.cognitoUserPoolClient}"
 
 package:
   individually: true
@@ -129,6 +116,11 @@ functions:
     memorySize: 512
     handler: app.main.handler
     module: module-app
+    environment:
+      LOG_AT_LEVEL: DEBUG
+      KURTEYT_TABLE: ${self:custom.naming.use.tableNameKurteyt}
+      USERPOOL_ID: "${self:custom.naming.use.cognitoUserPoolId}"
+      USERCLIENT_ID: "${self:custom.naming.use.cognitoUserPoolClient}"
     iamRoleStatementsName: ${self:custom.naming.use.lambdaRoleKurteytApi}
     iamRoleStatementsInherit: true
     iamRoleStatements:
@@ -151,20 +143,27 @@ functions:
           path: /api/v1/{proxy+}
           method: "OPTIONS"
       # Priority 2 - Authenticated Routes to api
-      # - httpApi:
-      #     path: /api/{proxy+}
-      #     method: "*"
-      #     authorizer:
-      #       name: cognitoJwtAuthorizer
-      #       scopes: # Optional
-      #         - aws.cognito.signin.user.admin
+      - httpApi:
+          path: /api/{proxy+}
+          method: "*"
       # Priority 3 - Allow top level GETS
       - httpApi:
           path: /{proxy+}
           method: "GET"
 
-          # Resources
+  edge:
+    name: ${self:custom.naming.use.lambdaNameKurteytEdge}
+    description: processes viewer request on cloudfront, handles redirect or passthrough
+    handler: edge.main.handler
+    module: module-edge
+    # versionFunctions: true
+    timeout: 3
+    memorySize: 128
+    role: !GetAtt CloudfrontEdgeFunctionRole.Arn
+
+# Resources
 resources:
   - ${file(infra/table.yaml)}
   - ${file(infra/domain.yaml)}
+  - ${file(infra/cloudfront.yaml)}
   - ${file(infra/outputs.yaml)}

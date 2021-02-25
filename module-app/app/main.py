@@ -59,7 +59,8 @@ if settings.BACKEND_CORS_ORIGINS:
     )
 
 # Set up routes
-app.include_router(api_router, prefix=settings.API_V1_STR, dependencies=[Depends(auth)])
+# app.include_router(api_router, prefix=settings.API_V1_STR, dependencies=[Depends(auth)])
+app.include_router(api_router, prefix=settings.API_V1_STR)
 
 
 # Set up health check

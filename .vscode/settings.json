@@ -30,11 +30,5 @@
   },
   "python.formatting.provider": "black",
   "python.sortImports.args": ["--src=${workspaceFolder}/module-app"],
-  "python.analysis.extraPaths": [
-    "module-app",
-    "module-bus",
-    "module-plops",
-    "module-stream",
-    "module-dispatches"
-  ]
+  "python.analysis.extraPaths": ["module-app", "module-edge"]
 }
