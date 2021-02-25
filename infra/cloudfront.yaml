@@ -6,6 +6,62 @@
 
 Resources:
   # ---------------------------------------------------------------------------
+  # Bucket to receive cloudfront logs
+  # ---------------------------------------------------------------------------
+  S3BucketLogs:
+    Type: AWS::S3::Bucket
+    Properties:
+      # AccelerateConfiguration:
+      #   AccelerateConfiguration
+      AccessControl: LogDeliveryWrite
+      # AnalyticsConfigurations:
+      #   - AnalyticsConfiguration
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      BucketName: ${self:custom.naming.use.bucketNameWebLogs}
+      # CorsConfiguration:
+      #   CorsConfiguration
+      # InventoryConfigurations:
+      #   - InventoryConfiguration
+      LifecycleConfiguration:
+        Rules:
+          - Id: AbortIncompleteMultipartUploadAfter1Day
+            Status: Enabled
+            AbortIncompleteMultipartUpload:
+              DaysAfterInitiation: 1
+          - Id: TransitionWithAge
+            Status: Enabled
+            Transitions:
+              - StorageClass: STANDARD_IA
+                TransitionInDays: 30
+              - StorageClass: GLACIER
+                TransitionInDays: 365
+      # LoggingConfiguration:
+      #   LoggingConfiguration
+      # MetricsConfigurations:
+      #   - MetricsConfiguration
+      # NotificationConfiguration:
+      #   NotificationConfiguration
+      # ObjectLockConfiguration:
+      #   ObjectLockConfiguration
+      # ObjectLockEnabled: Boolean
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: TRUE
+        BlockPublicPolicy: TRUE
+        IgnorePublicAcls: TRUE
+        RestrictPublicBuckets: TRUE
+      # ReplicationConfiguration:
+      #   ReplicationConfiguration
+      # Tags:
+      #   - Tag
+      # VersioningConfiguration:
+      #   VersioningConfiguration
+      # WebsiteConfiguration:
+      #   WebsiteConfiguration
+
+  # ---------------------------------------------------------------------------
   # Lambda edge role
   # ---------------------------------------------------------------------------
   CloudfrontEdgeFunctionRole:
@@ -103,10 +159,10 @@ Resources:
         Enabled: true
         HttpVersion: http2
         IPV6Enabled: true
-        # Logging:
-        #   Bucket: !GetAtt S3BucketLogs.DomainName
-        #   IncludeCookies: false
-        #   Prefix: cdn/
+        Logging:
+          Bucket: !GetAtt S3BucketLogs.DomainName
+          IncludeCookies: false
+          Prefix: kurteyt/
         # OriginGroups:
         #   OriginGroups
         Origins:
@@ -133,6 +189,6 @@ Resources:
         #   Restrictions
         ViewerCertificate:
           AcmCertificateArn: !Ref DomainCert
-          MinimumProtocolVersion: TLSv1.1_2016
+          MinimumProtocolVersion: TLSv1.2_2019
           SslSupportMethod: sni-only
         # WebACLId: String

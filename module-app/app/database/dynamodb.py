@@ -6,6 +6,7 @@ All interactions with dynamodb, this handles all interactions with database
 """
 
 from enum import Enum
+from os import environ
 from typing import Any, Dict
 
 import boto3
@@ -14,6 +15,10 @@ from pydantic.main import BaseModel
 from app import exceptions
 from app.core.logger import get_logger
 from app.database import util
+
+# Setup boto3
+AWS_REGION = environ.get("AWS_REGION")
+
 
 # from boto3.dynamodb.conditions import Attr, Key
 
@@ -51,7 +56,6 @@ class ConditionExpression(BaseModel):
 
 LOGGER = get_logger(__name__)
 
-SessionLocal = boto3.resource("dynamodb")
 
 # Lazy initialize boto3 resources
 RES_DYNAMODB = None
@@ -70,7 +74,7 @@ def _get_table(table: str) -> "boto3.resources.factory.dynamodb.Table":
 
     if RES_DYNAMODB is None:
         RES_DYNAMODB = (  # pylint: disable=redefined-outer-name,invalid-name
-            boto3.resource("dynamodb")
+            boto3.resource("dynamodb", region_name=AWS_REGION)
         )
 
     try:
@@ -216,7 +220,7 @@ class DynamoDB:
         LOGGER.debug(
             (
                 f"Function: update_item | Table: {self.table_name} |",
-                f"pk: {pk} | sk: {sk}",
+                f"pk: {pk}",
             )
         )
         LOGGER.log_json(update_data)
@@ -232,9 +236,8 @@ class DynamoDB:
             # Run db action
             response = self.Table.update_item(
                 Key={
-                    # PK and SK are on the record being passed in for updates
-                    "PK": pk,
-                    "SK": sk,
+                    # PK is on the record being passed in for updates
+                    "PK": pk
                 },
                 UpdateExpression=expression_statement,
                 ExpressionAttributeNames=expression_names,

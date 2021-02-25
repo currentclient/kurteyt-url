@@ -28,6 +28,7 @@ custom:
       lambda: ${self:custom.naming.prefix}-lambda
       role: ${self:custom.naming.prefix}-role
       db: ${self:custom.naming.prefix}-db
+      bucket: ${self:custom.naming.prefix}-bucket
     use:
       # Name of the cloudformation stack
       stackName: ${self:custom.naming.type.stack}-kurteyt
@@ -46,9 +47,12 @@ custom:
       cognitoUserPoolClient: ${env:COGNITOUSERPOOLCLIENT}
       domainName: ${env:DOMAIN_NAME}
       domainNameApi: api.${env:DOMAIN_NAME}
+      # Bucket for logs
+      bucketNameWebLogs: ${self:custom.naming.type.bucket}-kurteyt-logs
   # Plugin options
   dotenv:
     # default: project root
+    # Lambda at edge functions cannot have variables
     include:
       - []
   # serverless-iam-roles-per-function:

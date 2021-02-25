@@ -30,12 +30,7 @@ class ShortUrlBase(BaseModel):
     @classmethod
     def make_pk(cls, shorturl: str):
         """Make PK"""
-        return f"{cls.get_pk_hash()}{shorturl}"
-
-    @staticmethod
-    def get_pk_hash():
-        """Get PK prefix hash"""
-        return "SHORTURL#"
+        return shorturl
 
 
 class ShortUrlCreate(BaseModel):
