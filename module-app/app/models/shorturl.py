@@ -6,7 +6,7 @@ import string
 from typing import Optional
 
 from fastapi.encoders import jsonable_encoder
-from pydantic import BaseModel
+from pydantic import BaseModel, HttpUrl
 
 from app.core import util
 from app.core.logger import get_logger
@@ -22,7 +22,7 @@ class ShortUrlBase(BaseModel):
     redirect to it.
     """
 
-    TargetUrl: Optional[str] = None
+    TargetUrl: Optional[HttpUrl] = None
     ShortUrl: Optional[str] = None
     NumDaysUntilExpire: Optional[int] = None
     TTL: Optional[int] = None
@@ -40,7 +40,7 @@ class ShortUrlCreate(BaseModel):
     Properties to receive on shorturl creation
     """
 
-    TargetUrl: str
+    TargetUrl: HttpUrl
     NumDaysUntilExpire: int = 90
 
 
@@ -71,7 +71,7 @@ class ShortUrlInDB(ShortUrlInDBBase):
     record
     """
 
-    TargetUrl: str
+    TargetUrl: HttpUrl
     ShortUrl: str
     # Duplicating ids but adding dynamodb hash for access pattern readability
     PK: str  # SHORTURL#ShortUrl

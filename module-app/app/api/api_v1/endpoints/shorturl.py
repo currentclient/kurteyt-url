@@ -3,10 +3,9 @@
 
 from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException, Path, status
+from fastapi import APIRouter, HTTPException, Path, status
 
 from app import crud, exceptions, models
-from app.api import deps
 from app.core.logger import get_logger
 from app.core.responses import common_400_and_500
 
@@ -55,7 +54,7 @@ def read_shorturl(
     """Get shorturl record"""
     LOGGER.debug(
         (
-            f"Function: read_shorturl |",
+            "Function: read_shorturl |",
             f"short_url: {short_url}",
         )
     )
@@ -79,7 +78,7 @@ def delete_shorturl(
 
     LOGGER.debug(
         (
-            f"Function: delete_shorturl |",
+            "Function: delete_shorturl |",
             f"short_url: {short_url}",
         )
     )

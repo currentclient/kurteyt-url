@@ -104,7 +104,7 @@ Resources:
   # ---------------------------------------------------------------------------
   # Lambda edge version for cloudfront
   # ---------------------------------------------------------------------------
-  CloudfrontEdgeFunctionVersion:
+  CloudfrontEdgeFunctionVersion1:
     Type: AWS::Lambda::Version
     Properties:
       # CodeSha256: String
@@ -144,7 +144,7 @@ Resources:
           MinTTL: 0
           LambdaFunctionAssociations:
             - EventType: viewer-request
-              LambdaFunctionARN: !Ref CloudfrontEdgeFunctionVersion
+              LambdaFunctionARN: !Ref CloudfrontEdgeFunctionVersion1
           # OriginRequestPolicyId: String
           # RealtimeLogConfigArn: String
           # SmoothStreaming: Boolean

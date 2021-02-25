@@ -25,9 +25,9 @@ LOGGER = logger.get_logger("index")
 
 
 SUPPORTED_STATUS_CODES = {
-    301: "Moved Permanently",
-    302: "Found",
-    307: "Temporary Redirect",
+    "301": "Moved Permanently",
+    "302": "Found",
+    "307": "Temporary Redirect",
 }
 
 # Check its not an api route
@@ -86,24 +86,20 @@ def get_redirect_record(slug):
 
 
 # Return redirect
-def build_redirect(response, redirect_to_url, status_code=301):
+def build_redirect(response, redirect_to_url, status_code="301"):
     """Build the redirect response"""
 
     LOGGER.info(f"Build redirect to: {redirect_to_url}")
 
-    # Note: We can't completely create a new set of headers even for a redirect
-    # because Cloudfront fails painfully if you set (or clear) a "read-only" header.
-    # https://github.com/awsdocs/amazon-cloudfront-developer-guide/blob/master/doc_source/lambda-requirements-limits.md#read-only-headers
-
-    response["headers"]["location"] = [
-        {
-            "key": "Location",
-            "value": redirect_to_url,
-        }
-    ]
-
-    response["status"] = (status_code,)
-    response["statusDescription"] = SUPPORTED_STATUS_CODES[status_code]
+    response = {
+        "status": status_code,
+        "statusDescription": SUPPORTED_STATUS_CODES[status_code],
+        "headers": {
+            "cache-control": [{"key": "Cache-Control", "value": "max-age=100"}],
+            "content-type": [{"key": "Content-Type", "value": "text/html"}],
+            "location": [{"key": "Location", "value": redirect_to_url}],
+        },
+    }
 
     return response
 
@@ -112,12 +108,12 @@ def make_response(cloudfront_event):
     """Check the request and determine response"""
 
     request = cloudfront_event["request"]
-    response = cloudfront_event["response"]
 
-    # Enable HSTS
-    response["headers"]["strict-transport-security"] = [
-        {"key": "Strict-Transport-Security", "value": "max-age=63072000"},
-    ]
+    response = {
+        "headers": request["headers"],
+        "status": "200",
+        "statusDescription": "OK",
+    }
 
     # request.uri is just the URL path without hostname or querystring
     requested_path = request["uri"]
@@ -139,7 +135,7 @@ def make_response(cloudfront_event):
     redirect_record = get_redirect_record(requested_slug)
 
     if not redirect_record:
-        LOGGER.info("Forward to API, not a record")
+        LOGGER.info("Forward to API, no redirect recorded")
         return response
 
     # Find target URL
@@ -148,12 +144,15 @@ def make_response(cloudfront_event):
     LOGGER.info(f"Redirect to: {redirect_to_url}")
 
     response_with_redirect = build_redirect(response, redirect_to_url)
+    LOGGER.info(f"Return response {response_with_redirect}")
 
     return response_with_redirect
 
 
 def handler(evt=None, ctx=None):
     """Handle viewer-request"""
+
+    LOGGER.info(f"FULL EVENT: {evt}")
 
     try:
         #  Get the incoming request and the initial response from S3

@@ -3,84 +3,42 @@
     {
       "cf": {
         "config": {
-          "distributionDomainName": "test.cloudfront.net",
-          "distributionId": "EDFDVBD6EXAMPLE",
-          "eventType": "origin-response",
-          "requestId": "avs=="
+          "distributionDomainName": "abc.cloudfront.net",
+          "distributionId": "abc",
+          "eventType": "viewer-request",
+          "requestId": "abc=="
         },
         "request": {
-          "clientIp": "203.0.113.178",
+          "clientIp": "4.4.3.50",
           "headers": {
-            "x-forwarded-for": [
-              {
-                "key": "X-Forwarded-For",
-                "value": "203.0.113.178"
-              }
-            ],
+            "host": [{ "key": "Host", "value": "kurteyt.domain.io" }],
             "user-agent": [
               {
                 "key": "User-Agent",
-                "value": "Amazon CloudFront"
+                "value": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.182 Safari/537.36"
               }
             ],
-            "via": [
+            "pragma": [{ "key": "pragma", "value": "no-cache" }],
+            "cache-control": [{ "key": "cache-control", "value": "no-cache" }],
+            "accept": [
               {
-                "key": "Via",
-                "value": "2.0 erf.cloudfront.net (CloudFront)"
+                "key": "accept",
+                "value": "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8"
               }
             ],
-            "host": [
+            "referer": [
               {
-                "key": "Host",
-                "value": "example.org"
+                "key": "referer",
+                "value": "https://kurteyt.domain.io/docs"
               }
             ],
-            "cache-control": [
-              {
-                "key": "Cache-Control",
-                "value": "no-cache, cf-no-cache"
-              }
+            "accept-language": [
+              { "key": "accept-language", "value": "en-US,en;q=0.9" }
             ]
           },
           "method": "GET",
-          "origin": {
-            "custom": {
-              "customHeaders": {},
-              "domainName": "example.org",
-              "keepaliveTimeout": 5,
-              "path": "",
-              "port": 443,
-              "protocol": "https",
-              "readTimeout": 30,
-              "sslProtocols": ["TLSv1", "TLSv1.1", "TLSv1.2"]
-            }
-          },
-          "querystring": "",
+          "querystring": "/lICAWhDO",
           "uri": "/lICAWhDO"
-        },
-        "response": {
-          "headers": {
-            "access-control-allow-credentials": [
-              {
-                "key": "Access-Control-Allow-Credentials",
-                "value": "true"
-              }
-            ],
-            "access-control-allow-origin": [
-              {
-                "key": "Access-Control-Allow-Origin",
-                "value": "*"
-              }
-            ],
-            "content-length": [
-              {
-                "key": "Content-Length",
-                "value": "9593"
-              }
-            ]
-          },
-          "status": "200",
-          "statusDescription": "OK"
         }
       }
     }
