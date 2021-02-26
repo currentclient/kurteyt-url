@@ -15,6 +15,7 @@ AWS_REGION = "us-east-1"
 
 # Dyanmodb table name
 KERTEYT_TABLE_NAME = None
+EXPIRED_REDIRECT = None
 
 # Lazy init cli
 RES_CONTACT_TABLE = None
@@ -35,7 +36,9 @@ def check_is_apiroute(path):
     LOGGER.info(f"Checking is api route: {path}")
     is_apiroute = False
 
-    if path.startswith("shorten"):
+    if path.startswith("docs"):
+        is_apiroute = True
+    if path.startswith("api/"):
         is_apiroute = True
 
     return is_apiroute
@@ -108,39 +111,38 @@ def make_response(cloudfront_event):
 
     request = cloudfront_event["request"]
 
-    response = {
-        "headers": request["headers"],
-        "status": "200",
-        "statusDescription": "OK",
-    }
-
     # request.uri is just the URL path without hostname or querystring
     requested_path = request["uri"]
     # Remove leading slash
     requested_slug = requested_path[1:]
     requested_method = request["method"]
 
-    # Return response and let it continue
+    # Return original and let it continue
     if check_is_apiroute(requested_slug):
         LOGGER.info("Forward to API")
-        return response
+        return request
 
     # If its not a GET method, dont redirect
     if not check_is_getmethod(requested_method):
         LOGGER.info("Forward to API, not a GET")
-        return response
+        return request
 
     # Read slug from dynamodb to get redirect path
     redirect_record = get_redirect_record(requested_slug)
 
     if not redirect_record:
         LOGGER.info("Forward to API, no redirect recorded")
-        return response
+        redirect_record = {"TargetUrl": EXPIRED_REDIRECT}
 
     # Find target URL
-
     redirect_to_url = redirect_record.get("TargetUrl")
     LOGGER.info(f"Redirect to: {redirect_to_url}")
+
+    response = {
+        "headers": request["headers"],
+        "status": "200",
+        "statusDescription": "OK",
+    }
 
     response_with_redirect = build_redirect(response, redirect_to_url)
     LOGGER.info(f"Return response {response_with_redirect}")
@@ -175,12 +177,16 @@ def handler(evt=None, ctx=None):
 def handler_dev(evt=None, ctx=None):
     """dev env"""
     global KERTEYT_TABLE_NAME
+    global EXPIRED_REDIRECT
     KERTEYT_TABLE_NAME = "cc-east-dev-db-kurteyt"
-    handler(evt, ctx)
+    EXPIRED_REDIRECT = "https://demo.currentclient.io/expired"
+    return handler(evt, ctx)
 
 
 def handler_prd(evt=None, ctx=None):
     """prd env"""
     global KERTEYT_TABLE_NAME
+    global EXPIRED_REDIRECT
     KERTEYT_TABLE_NAME = "cc-east-prd-db-kurteyt"
-    handler(evt, ctx)
+    EXPIRED_REDIRECT = "https://currentclient.com/expired"
+    return handler(evt, ctx)

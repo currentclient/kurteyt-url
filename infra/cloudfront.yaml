@@ -88,7 +88,12 @@ Resources:
                   - logs:CreateLogStream
                   - logs:PutLogEvents
                 Resource:
+                  - !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${self:custom.naming.use.lambdaNameKurteytEdge}:*"
                   - !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${self:custom.naming.use.lambdaNameKurteytEdge}:*:*"
+                  # Lambda at edge creates log group for each region that the lambda is pushed to
+                  - !Sub "arn:aws:logs:*:${AWS::AccountId}:log-group:/aws/lambda/*.${self:custom.naming.use.lambdaNameKurteytEdge}:*"
+                  - !Sub "arn:aws:logs:*:${AWS::AccountId}:log-group:/aws/lambda/*.${self:custom.naming.use.lambdaNameKurteytEdge}:*:*"
+
         - PolicyName: AllowKurteytTableCRUD
           PolicyDocument:
             Version: "2012-10-17"
@@ -103,12 +108,16 @@ Resources:
 
   # ---------------------------------------------------------------------------
   # Lambda edge version for cloudfront
+  #
+  # This resources holds the arn to the lambda and the version
+  # which is needed by cloudfront. Can increment the resource name
+  # to get the new version created
   # ---------------------------------------------------------------------------
-  CloudfrontEdgeFunctionVersion1:
+  CloudfrontEdgeFunctionVersionA:
     Type: AWS::Lambda::Version
     Properties:
       # CodeSha256: String
-      Description: "version for lambda at edge"
+      Description: "kurteyt"
       FunctionName: !Ref EdgeLambdaFunction
       # ProvisionedConcurrencyConfig:
       #   ProvisionedConcurrencyConfiguration
@@ -144,7 +153,7 @@ Resources:
           MinTTL: 0
           LambdaFunctionAssociations:
             - EventType: viewer-request
-              LambdaFunctionARN: !Ref CloudfrontEdgeFunctionVersion1
+              LambdaFunctionARN: !Ref CloudfrontEdgeFunctionVersionA
           # OriginRequestPolicyId: String
           # RealtimeLogConfigArn: String
           # SmoothStreaming: Boolean

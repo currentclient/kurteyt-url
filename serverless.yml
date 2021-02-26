@@ -91,7 +91,7 @@ provider:
       allowedOrigins:
         - http://localhost:8000
         - http://0.0.0.0:8000
-        - https://demo.currentclient.io
+        - https://cclient.io
       allowedHeaders:
         - Content-Type
         - Authorization
@@ -152,7 +152,7 @@ functions:
   edge:
     name: ${self:custom.naming.use.lambdaNameKurteytEdge}
     description: processes viewer request on cloudfront, handles redirect or passthrough
-    handler: ${edgeHandler.${self:provider.stage}} # dev or prd handler to hardcode the table name in
+    handler: ${self:custom.edgeHandler.${self:provider.stage}} # dev or prd handler to hardcode the table name in
     module: module-edge
     # versionFunctions: true
     timeout: 3
