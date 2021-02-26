@@ -4,7 +4,8 @@ disable=
     raise-missing-from,
     no-member,
     too-few-public-methods,
-    broad-except
+    broad-except,
+    global-statement
 
 [FORMAT]
 max-line-length=88

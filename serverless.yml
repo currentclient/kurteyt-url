@@ -41,14 +41,13 @@ custom:
       lambdaRoleKurteytEdge: ${self:custom.naming.type.role}-kurteyt-edge
       # Name of the table
       tableNameKurteyt: ${self:custom.naming.type.db}-kurteyt
-      # User pool endpoint
-      cognitoUserPoolId: ${env:USERPOOL_ID}
-      cognitoUserPoolUrl: ${env:USERPOOL_URL}
-      cognitoUserPoolClient: ${env:COGNITOUSERPOOLCLIENT}
       domainName: ${env:DOMAIN_NAME}
       domainNameApi: api.${env:DOMAIN_NAME}
       # Bucket for logs
       bucketNameWebLogs: ${self:custom.naming.type.bucket}-kurteyt-logs
+  edgeHandler:
+    dev: edge.main.handler_dev
+    prd: edge.main.handler_prd
   # Plugin options
   dotenv:
     # default: project root
@@ -109,9 +108,6 @@ provider:
 
 package:
   individually: true
-  # exclude:
-  #   - "*/**"
-  #   - "*"
 
 functions:
   app:
@@ -123,8 +119,6 @@ functions:
     environment:
       LOG_AT_LEVEL: DEBUG
       KURTEYT_TABLE: ${self:custom.naming.use.tableNameKurteyt}
-      USERPOOL_ID: "${self:custom.naming.use.cognitoUserPoolId}"
-      USERCLIENT_ID: "${self:custom.naming.use.cognitoUserPoolClient}"
     iamRoleStatementsName: ${self:custom.naming.use.lambdaRoleKurteytApi}
     iamRoleStatementsInherit: true
     iamRoleStatements:
@@ -158,7 +152,7 @@ functions:
   edge:
     name: ${self:custom.naming.use.lambdaNameKurteytEdge}
     description: processes viewer request on cloudfront, handles redirect or passthrough
-    handler: edge.main.handler
+    handler: ${edgeHandler.${self:provider.stage}} # dev or prd handler to hardcode the table name in
     module: module-edge
     # versionFunctions: true
     timeout: 3

@@ -14,11 +14,10 @@ SESSION = boto3.session.Session()
 AWS_REGION = "us-east-1"
 
 # Dyanmodb table name
-KERTEYT_TABLE_NAME = "cc-east-dev-db-kurteyt"
+KERTEYT_TABLE_NAME = None
 
 # Lazy init cli
 RES_CONTACT_TABLE = None
-
 
 # Setup logger
 LOGGER = logger.get_logger("index")
@@ -166,3 +165,22 @@ def handler(evt=None, ctx=None):
     except Exception as err:
         LOGGER.error("Failed with error: %s", err)
         raise err
+
+
+# Different handler for each env to handle
+# to set env variables, since cant pass in
+# env variables to lambda @edge function
+
+
+def handler_dev(evt=None, ctx=None):
+    """dev env"""
+    global KERTEYT_TABLE_NAME
+    KERTEYT_TABLE_NAME = "cc-east-dev-db-kurteyt"
+    handler(evt, ctx)
+
+
+def handler_prd(evt=None, ctx=None):
+    """prd env"""
+    global KERTEYT_TABLE_NAME
+    KERTEYT_TABLE_NAME = "cc-east-prd-db-kurteyt"
+    handler(evt, ctx)
