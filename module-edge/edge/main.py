@@ -40,6 +40,8 @@ def check_is_apiroute(path):
         is_apiroute = True
     if path.startswith("api/"):
         is_apiroute = True
+    if path.startswith("openapi"):
+        is_apiroute = True
 
     return is_apiroute
 
@@ -113,8 +115,9 @@ def make_response(cloudfront_event):
 
     # request.uri is just the URL path without hostname or querystring
     requested_path = request["uri"]
-    # Remove leading slash
-    requested_slug = requested_path[1:]
+    # Remove leading and ending slash
+    requested_slug = requested_path.lstrip("/").rstrip("/")
+
     requested_method = request["method"]
 
     # Return original and let it continue

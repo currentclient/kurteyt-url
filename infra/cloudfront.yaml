@@ -142,6 +142,11 @@ Resources:
         DefaultCacheBehavior:
           AllowedMethods:
             - GET
+            - POST
+            - OPTIONS
+            - PUT
+            - PATCH
+            - DELETE
             - HEAD
           CachedMethods:
             - GET
