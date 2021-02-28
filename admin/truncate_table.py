@@ -11,11 +11,13 @@ def truncate_table(table_name):
 
     # get the table keys
     table_key_names = [key.get("AttributeName") for key in table.key_schema]
+    print(table_key_names)
 
     # Only retrieve the keys for each item in the table (minimize data transfer)
     projection_expression = ", ".join(table_key_names)
+    print(projection_expression)
 
-    response = table.scan(projection_expression)
+    response = table.scan(AttributesToGet=[projection_expression])
     data = response.get("Items")
 
     while "LastEvaluatedKey" in response:
