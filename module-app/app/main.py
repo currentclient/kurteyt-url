@@ -32,7 +32,7 @@ LOGGER = get_logger(__name__)
 tags_metadata: Optional[List[Dict[str, Any]]] = [
     {
         "name": "kurteyts",
-        "description": "All the apis to create and manage a kurteyt. Create a kurteyt shell to start, and then proceed to add a clientform and contacts.",
+        "description": "shorten a url, set expiration.",
     },
 ]
 
@@ -80,4 +80,4 @@ def read_items(request: Request):
 
 
 # Wrap in ASGI to deploy on lambda
-handler = Mangum(app, enable_lifespan=False)
+handler = Mangum(app, enable_lifespan=False, log_level="warning")
