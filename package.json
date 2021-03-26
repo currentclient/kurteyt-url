@@ -4,9 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "deploy": "serverless deploy --verbose --force --stage $1",
-    "package": "serverless package --verbose --force --stage $1",
-    "remove": "serverless remove --verbose --force --stage $1",
+    "deploy": "serverless deploy --verbose --force --stage $TARGET_ENV --region $1",
+    "package": "serverless package --verbose --force --stage $TARGET_ENV --region $1",
+    "remove": "serverless remove --verbose --force --stage $TARGET_ENV --region $1",
     "up": "docker-compose up --build --remove-orphan",
     "box": "docker exec -it kurteyt-url_api_1 /bin/bash",
     "local:offline": "serverless offline",

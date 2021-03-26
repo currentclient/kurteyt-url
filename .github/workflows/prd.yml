@@ -1,0 +1,36 @@
+# Deploy to s3 and refresh cloudfront
+
+name: prd release
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+env:
+  TARGET_ENV: prd
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    environment: prd
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.PRD_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.PRD_AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-west-2
+
+      - name: Install
+        run: |
+          npm install
+
+      - name: Build
+        run: |
+          npm run deploy $TARGET_ENV
