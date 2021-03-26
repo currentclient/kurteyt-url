@@ -35,4 +35,4 @@ jobs:
 
       - name: Deploy West
         run: |
-          npm run deploy "us-west-2"
+          npm run deploy

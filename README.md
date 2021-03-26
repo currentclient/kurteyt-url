@@ -5,6 +5,7 @@ A url shortener using Fastapi on lambda, dynamodb, and cloudfront.
 ## Notes
 
 - Lambda at edge logs will be recorded in each region (edge) where the viewer made the request
+- Needs to have an ACM cert configured for the domain and its `api.` subdomain
 
 ## &#x1F4DA; Developer Reference
 
