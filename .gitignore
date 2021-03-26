@@ -28,6 +28,4 @@ __pycache__
 
 .DS_Store
 
-.env
-.env.dev
 docker-compose.yml
