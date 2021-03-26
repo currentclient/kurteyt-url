@@ -8,6 +8,7 @@ on:
       - develop
     paths-ignore:
       - "**/README.md"
+      - "**/.vscode/**"
       - "**/dox/**"
       - "**/admin/**"
 
