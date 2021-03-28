@@ -1,5 +1,3 @@
-# Deploy to s3 and refresh cloudfront
-
 name: dev release
 
 on:
@@ -8,7 +6,6 @@ on:
       - develop
     paths-ignore:
       - "**/README.md"
-      - "**/.vscode/**"
       - "**/dox/**"
       - "**/admin/**"
 

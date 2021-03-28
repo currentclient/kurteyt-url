@@ -191,5 +191,5 @@ def handler_prd(evt=None, ctx=None):
     global KERTEYT_TABLE_NAME
     global EXPIRED_REDIRECT
     KERTEYT_TABLE_NAME = "cc-east-prd-db-kurteyt"
-    EXPIRED_REDIRECT = "https://currentclient.com/expired"
+    EXPIRED_REDIRECT = "https://app.currentclient.com/expired"
     return handler(evt, ctx)
