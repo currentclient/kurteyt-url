@@ -1,0 +1,39 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "ApiAdmin",
+      "Effect": "Allow",
+      "Action": [
+        "cloudformation:*",
+        "ssm:*",
+        "logs:*",
+        "cloudfront:*",
+        "s3:*",
+        "apigateway:*",
+        "lambda:*",
+        "dynamodb:*"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "AllowRoles",
+      "Effect": "Allow",
+      "Action": [
+        "iam:GetRole",
+        "iam:CreateRole",
+        "iam:DeleteRole",
+        "iam:GetRolePolicy",
+        "iam:DeleteRolePolicy",
+        "iam:PutRolePolicy",
+        "iam:TagRole",
+        "iam:PassRole"
+      ],
+      "Resource": [
+        "arn:aws:iam::${AWS::AccountId}:role/cc-east-dev-role-kurteyt-api",
+        "arn:aws:iam::${AWS::AccountId}:role/cc-east-dev-role-kurteyt-edge",
+        "arn:aws:iam::${AWS::AccountId}:role/kurteyt-url-dev-us-east-1-lambdaRole"
+      ]
+    }
+  ]
+}

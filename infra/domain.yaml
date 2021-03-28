@@ -9,7 +9,7 @@ Resources:
       DomainName: ${self:custom.naming.use.domainNameApi}
       DomainNameConfigurations:
         - EndpointType: REGIONAL
-          CertificateArn: !Ref DomainCert
+          CertificateArn: ${self:custom.naming.use.domainNameCertArn}
           # CertificateName: customer
       # MutualTlsAuthentication:
       #   MutualTlsAuthentication
@@ -22,22 +22,3 @@ Resources:
       # ApiMappingKey: String
       DomainName: !Ref ApiDomainName
       Stage: !Ref HttpApiStage
-
-  # ---------------------------------------------------------------------------
-  # ACM cert
-  # ---------------------------------------------------------------------------
-  DomainCert:
-    Type: AWS::CertificateManager::Certificate
-    Properties:
-      # CertificateAuthorityArn: String
-      # CertificateTransparencyLoggingPreference: String
-      DomainName: ${self:custom.naming.use.domainName}
-      # DomainValidationOptions:
-      #   - DomainValidationOption
-      SubjectAlternativeNames:
-        - "*.${self:custom.naming.use.domainName}"
-        - "*.${self:custom.naming.use.domainNameApi}"
-        - "*.api.${self:custom.naming.region}.${self:custom.naming.use.domainName}"
-      # Tags:
-      #   - Tag
-      ValidationMethod: DNS
