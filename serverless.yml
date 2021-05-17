@@ -42,7 +42,7 @@ custom:
       tableNameKurteyt: ${self:custom.naming.type.db}-kurteyt
       domainName: ${env:DOMAIN_NAME}
       domainNameApi: api.${env:DOMAIN_NAME}
-      domainNameCertArn: ${ssm:/cc/east/${self:provider.stage}/acm/arn/short}
+      domainNameCertArn: ${ssm:/cc/east/${self:provider.stage}/acm/arn/becurrent}
       # Bucket for logs
       bucketNameWebLogs: ${self:custom.naming.type.bucket}-kurteyt-logs
   edgeHandler:
