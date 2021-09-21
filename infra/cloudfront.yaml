@@ -113,7 +113,7 @@ Resources:
   # which is needed by cloudfront. Can increment the resource name
   # to get the new version created
   # ---------------------------------------------------------------------------
-  CloudfrontEdgeFunctionVersionA:
+  CloudfrontEdgeFunctionVersionB:
     Type: AWS::Lambda::Version
     Properties:
       # CodeSha256: String
