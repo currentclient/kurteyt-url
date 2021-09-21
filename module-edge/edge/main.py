@@ -141,16 +141,30 @@ def make_response(cloudfront_event):
     redirect_to_url = redirect_record.get("TargetUrl")
     LOGGER.info(f"Redirect to: {redirect_to_url}")
 
+    longinformation = """
+    <h1 style="color: #5e9ca0;">You can edit <span style="color: #2b2301;">this demo</span> text!</h1>
+    <h2 style="color: #2e6c80;">How to send HTML with AWS lambda in Python:</h2>
+    <p>Paste your documents in the visual editor on the left or your HTML code in the source editor in the right. <br />Edit any of the two areas and see the other changing in real time.&nbsp;</p>
+    """
+
     response = {
-        "headers": request["headers"],
-        "status": "200",
-        "statusDescription": "OK",
+        "statusCode": 200,
+        "headers": {"Content-Type": "text/html"},  # it really works by Hector Duran!
+        "body": longinformation,
     }
 
-    response_with_redirect = build_redirect(response, redirect_to_url)
-    LOGGER.info(f"Return response {response_with_redirect}")
+    return response
 
-    return response_with_redirect
+    # response = {
+    #     "headers": request["headers"],
+    #     "status": "200",
+    #     "statusDescription": "OK",
+    # }
+
+    # response_with_redirect = build_redirect(response, redirect_to_url)
+    # LOGGER.info(f"Return response {response_with_redirect}")
+
+    # return response_with_redirect
 
 
 def handler(evt=None, ctx=None):
