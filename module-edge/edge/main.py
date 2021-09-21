@@ -163,7 +163,12 @@ def handler(evt=None, ctx=None):
     <html lang="en">
     <head>
         <meta charset="utf-8">
-        <title>Simple Lambda@Edge Static Content Response</title>
+        <meta property="og:title" content="buy this knudsen" />
+        <meta
+          property="og:image"
+          content="https://img.ksl.com/mx/mplace-classifieds.ksl.com/1887550-1632239390-928894.jpg"
+        />
+        <title>special</title>
     </head>
     <body>
         <p>Hello from Lambda@Edge!</p>
