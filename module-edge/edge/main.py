@@ -158,31 +158,36 @@ def handler(evt=None, ctx=None):
 
     LOGGER.info(f"FULL EVENT: {evt}")
 
-    CONTENT = """
-    <\!DOCTYPE html>
+    html_page = """
+    <!DOCTYPE html>
     <html lang="en">
     <head>
-        <meta charset="utf-8">
-        <meta property="og:title" content="buy this knudsen" />
-        <meta
-          property="og:image"
-          content="https://img.ksl.com/mx/mplace-classifieds.ksl.com/1887550-1632239390-928894.jpg"
-        />
-        <title>special</title>
+        <meta charset="utf-8" />
+        <!-- OG settings -->
+        <meta property="og:title" content="$OG_TITLE" />
+        <meta property="og:description" content="$OG_DESCRIPTION" />
+        <meta property="og:url" content="$OG_URL" />
+        <meta property="og:image" content="$OG_IMAGE" />
+        <meta property="og:image:alt" content="$OG_IMAGE_ALT" />
+        <meta property="og:type" content="website" />
+        <title>CurrentClient</title>
     </head>
-    <body onload="redirect()">
-        <p>special</p>
+    <body>
+        <p>welcome friend</p>
+
+        <a href="$REDIRECT_URL">Open my form</a>
     </body>
-
-    <script language=javascript>
-    function redirect(){
-        window.location = "http://google.com";
-    }
-    </script>
-
-
     </html>
     """
+
+    html_page = html_page.replace("$OG_TITLE", "title")
+    html_page = html_page.replace("$OG_DESCRIPTION", "description")
+    html_page = html_page.replace("$OG_URL", "url")
+    html_page = html_page.replace(
+        "$OG_IMAGE",
+        "https://img.ksl.com/mx/mplace-classifieds.ksl.com/1887550-1632239390-928894.jpg?filter=marketplace/664x500",
+    )
+    html_page = html_page.replace("$REDIRECT_URL", "https://www.currentclient.com/")
 
     response = {
         "status": "200",
@@ -191,7 +196,7 @@ def handler(evt=None, ctx=None):
             "cache-control": [{"key": "Cache-Control", "value": "max-age=100"}],
             "content-type": [{"key": "Content-Type", "value": "text/html"}],
         },
-        "body": CONTENT,
+        "body": html_page,
     }
 
     return response
