@@ -170,9 +170,17 @@ def handler(evt=None, ctx=None):
         />
         <title>special</title>
     </head>
-    <body>
-        <p>Hello from Lambda@Edge!</p>
+    <body onload="redirect()">
+        <p>special</p>
     </body>
+
+    <script language=javascript>
+    function redirect(){
+        window.location = "http://google.com";
+    }
+    </script>
+
+
     </html>
     """
 
