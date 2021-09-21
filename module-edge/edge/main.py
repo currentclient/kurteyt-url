@@ -158,16 +158,27 @@ def handler(evt=None, ctx=None):
 
     LOGGER.info(f"FULL EVENT: {evt}")
 
-    longinformation = """
-    <h1 style="color: #5e9ca0;">VELLL YA You can edit <span style="color: #2b2301;">this demo</span> text!</h1>
-    <h2 style="color: #2e6c80;">How to send HTML with AWS lambda in Python:</h2>
-    <p>Paste your documents in the visual editor on the left or your HTML code in the source editor in the right. <br />Edit any of the two areas and see the other changing in real time.&nbsp;</p>
+    CONTENT = """
+    <\!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>Simple Lambda@Edge Static Content Response</title>
+    </head>
+    <body>
+        <p>Hello from Lambda@Edge!</p>
+    </body>
+    </html>
     """
 
     response = {
-        "statusCode": 200,
-        "headers": {"Content-Type": "text/html"},  # it really works by Hector Duran!
-        "body": longinformation,
+        "status": "200",
+        "statusDescription": "OK",
+        "headers": {
+            "cache-control": [{"key": "Cache-Control", "value": "max-age=100"}],
+            "content-type": [{"key": "Content-Type", "value": "text/html"}],
+        },
+        "body": CONTENT,
     }
 
     return response
