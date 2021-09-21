@@ -141,8 +141,25 @@ def make_response(cloudfront_event):
     redirect_to_url = redirect_record.get("TargetUrl")
     LOGGER.info(f"Redirect to: {redirect_to_url}")
 
+    response = {
+        "headers": request["headers"],
+        "status": "200",
+        "statusDescription": "OK",
+    }
+
+    response_with_redirect = build_redirect(response, redirect_to_url)
+    LOGGER.info(f"Return response {response_with_redirect}")
+
+    return response_with_redirect
+
+
+def handler(evt=None, ctx=None):
+    """Handle viewer-request"""
+
+    LOGGER.info(f"FULL EVENT: {evt}")
+
     longinformation = """
-    <h1 style="color: #5e9ca0;">You can edit <span style="color: #2b2301;">this demo</span> text!</h1>
+    <h1 style="color: #5e9ca0;">VELLL YA You can edit <span style="color: #2b2301;">this demo</span> text!</h1>
     <h2 style="color: #2e6c80;">How to send HTML with AWS lambda in Python:</h2>
     <p>Paste your documents in the visual editor on the left or your HTML code in the source editor in the right. <br />Edit any of the two areas and see the other changing in real time.&nbsp;</p>
     """
@@ -155,35 +172,18 @@ def make_response(cloudfront_event):
 
     return response
 
-    # response = {
-    #     "headers": request["headers"],
-    #     "status": "200",
-    #     "statusDescription": "OK",
-    # }
+    # try:
+    #     #  Get the incoming request and the initial response from S3
+    #     #  https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/lambda-event-structure.html
+    #     cloudfront_event = evt["Records"][0]["cf"]
 
-    # response_with_redirect = build_redirect(response, redirect_to_url)
-    # LOGGER.info(f"Return response {response_with_redirect}")
+    #     res = make_response(cloudfront_event)
 
-    # return response_with_redirect
+    #     return res
 
-
-def handler(evt=None, ctx=None):
-    """Handle viewer-request"""
-
-    LOGGER.info(f"FULL EVENT: {evt}")
-
-    try:
-        #  Get the incoming request and the initial response from S3
-        #  https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/lambda-event-structure.html
-        cloudfront_event = evt["Records"][0]["cf"]
-
-        res = make_response(cloudfront_event)
-
-        return res
-
-    except Exception as err:
-        LOGGER.error("Failed with error: %s", err)
-        raise err
+    # except Exception as err:
+    #     LOGGER.error("Failed with error: %s", err)
+    #     raise err
 
 
 # Different handler for each env to handle
