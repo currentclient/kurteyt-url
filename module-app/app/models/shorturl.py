@@ -50,7 +50,7 @@ class ShortUrlBase(BaseModel):
     ShortId: Optional[str] = None
     NumDaysUntilExpire: Optional[int] = None
     TTL: Optional[int] = None
-    OgSettings: Optional[OgSettings] = None
+    OgSettings: Optional[OgSettings]
 
     @classmethod
     def make_pk(cls, short_id: str):
@@ -68,7 +68,7 @@ class ShortUrlCreate(BaseModel):
     TargetUrl: HttpUrl
     NumDaysUntilExpire: int = 90
     RedirectType: Optional[RedirectTypeEnum] = RedirectTypeEnum.DIRECT
-    OgSettings: Optional[OgSettings] = None
+    OgSettings: Optional[OgSettings]
 
 
 class ShortUrlUpdate(ShortUrlCreate):
