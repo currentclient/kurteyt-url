@@ -228,7 +228,7 @@ HTML_TEMPLATE = """
                 border-bottom-style: solid;
                 border-bottom-color: #e5e7eb;
               "
-              src="https://www.wasatchbg.com/uploads/1/2/2/8/122827489/published/wasatch-benefits-group-logo.png?1577672207"
+              src="$OG_IMAGE"
               alt=""
             />
           </div>
