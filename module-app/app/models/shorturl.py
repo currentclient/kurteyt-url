@@ -34,7 +34,7 @@ class OgSettings(BaseModel):
     OgDescription: str
     OgUrl: str
     OgImage: str
-    OgImage_alt: str
+    OgImageAlt: str
 
 
 class ShortUrlBase(BaseModel):

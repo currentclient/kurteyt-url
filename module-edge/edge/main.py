@@ -48,6 +48,15 @@ HTML_TEMPLATE = """
       href="https://fonts.googleapis.com/css2?family=Caveat&display=swap"
       rel="stylesheet"
     />
+
+    <script>
+      window.onload = function () {
+        // similar behavior as clicking on a link
+        setTimeout(() => {
+          window.location.href = "$REDIRECT_URL";
+        }, 3000);
+      };
+    </script>
     <style>
       /* RESET */
       /* Box sizing rules */
@@ -219,7 +228,7 @@ HTML_TEMPLATE = """
                 border-bottom-style: solid;
                 border-bottom-color: #e5e7eb;
               "
-              src="$OG_IMAGE"
+              src="https://www.wasatchbg.com/uploads/1/2/2/8/122827489/published/wasatch-benefits-group-logo.png?1577672207"
               alt=""
             />
           </div>
@@ -253,6 +262,7 @@ HTML_TEMPLATE = """
     </div>
   </body>
 </html>
+
 
 """
 
@@ -343,7 +353,7 @@ def build_og_redirect(response, redirect_record):
         .replace("$OG_URL", og_url)
         .replace("$OG_IMAGE", og_image)
         .replace("$OG_IMAGE_ALT", og_image_alt)
-        .replace("$$REDIRECT_URL", target_url)
+        .replace("$REDIRECT_URL", target_url)
     )
 
     response = {
