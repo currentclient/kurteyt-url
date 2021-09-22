@@ -24,7 +24,241 @@ RES_CONTACT_TABLE = None
 LOGGER = logger.get_logger("index")
 
 
+HTML_TEMPLATE = """
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <!-- OG settings -->
+    <meta property="og:title" content="$OG_TITLE" />
+    <meta property="og:description" content="$OG_DESCRIPTION" />
+    <meta property="og:url" content="$OG_URL" />
+    <meta property="og:image" content="$OG_IMAGE" />
+    <meta property="og:image:alt" content="$OG_IMAGE_ALT" />
+    <meta property="og:type" content="website" />
+    <title>CurrentClient</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Caveat&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      /* RESET */
+      /* Box sizing rules */
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+
+      /* Remove default margin */
+      body,
+      h1,
+      h2,
+      h3,
+      h4,
+      p,
+      figure,
+      blockquote,
+      dl,
+      dd {
+        margin: 0;
+      }
+
+      /* Remove list styles on ul, ol elements with a list role, which suggests default styling will be removed */
+      ul[role="list"],
+      ol[role="list"] {
+        list-style: none;
+      }
+
+      /* Set core root defaults */
+      html:focus-within {
+        scroll-behavior: smooth;
+      }
+
+      /* Set core body defaults */
+      body {
+        min-height: 100vh;
+        text-rendering: optimizeSpeed;
+        line-height: 1.5;
+      }
+
+      /* A elements that don't have a class get default styles */
+      a:not([class]) {
+        text-decoration-skip-ink: auto;
+      }
+
+      /* Make images easier to work with */
+      img,
+      picture {
+        max-width: 100%;
+        display: block;
+      }
+
+      /* Inherit fonts for inputs and buttons */
+      input,
+      button,
+      textarea,
+      select {
+        font: inherit;
+      }
+
+      /* Remove all animations, transitions and smooth scroll for people that prefer not to see them */
+      @media (prefers-reduced-motion: reduce) {
+        html:focus-within {
+          scroll-behavior: auto;
+        }
+
+        *,
+        *::before,
+        *::after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+          scroll-behavior: auto !important;
+        }
+      }
+
+      /* ^^^ RESET */
+
+      body {
+        font-family: "Inter", sans-serif;
+      }
+
+      .gotobutton {
+        text-align: center;
+        display: block;
+        text-decoration: none;
+        background-color: white;
+        color: #6b7280;
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+      }
+      .gotobutton:hover {
+        background-color: #e5e7eb;
+      }
+
+      .gotobutton:active {
+        background-color: #d1d5db;
+      }
+
+      .gotobutton:visited {
+        background-color: #ccc;
+      }
+
+      .signature {
+        text-align: right;
+        font-size: 24px;
+        font-family: "Caveat", cursive;
+      }
+
+      .spinner-2 {
+        width: 75px;
+        height: 75px;
+        border-radius: 50%;
+        background: radial-gradient(farthest-side, #3b82f6 94%, #0000) top/8px
+            12px no-repeat,
+          conic-gradient(#0000 30%, #3b82f6);
+        -webkit-mask: radial-gradient(
+          farthest-side,
+          #0000 calc(100% - 12px),
+          #000 0
+        );
+        animation: s3 1s infinite linear;
+      }
+
+      @keyframes s3 {
+        100% {
+          transform: rotate(1turn);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div style="min-height: 100vh; padding: 2rem; display: flex">
+      <div
+        style="
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+        "
+      >
+        <div
+          style="
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%;
+            max-width: 32rem;
+            border-radius: 8px;
+            border-width: 1px;
+            border-style: solid;
+            border-color: #e5e7eb;
+            padding-top: 2rem;
+            padding-bottom: 2rem;
+            padding-left: 4rem;
+            padding-right: 4rem;
+          "
+        >
+          <div style="overflow: hidden; border-radius: 4px">
+            <img
+              style="
+                height: 100%;
+                display: block;
+                object-fit: contain;
+                width: 400px;
+                padding-bottom: 2rem;
+                border-bottom-width: 1px;
+                border-bottom-style: solid;
+                border-bottom-color: #e5e7eb;
+              "
+              src="$OG_IMAGE"
+              alt=""
+            />
+          </div>
+
+          <div>
+            <p style="font-size: 1.5rem; text-align: center; padding-top: 2rem">
+              Preparing your information now...
+            </p>
+            <div style="margin-top: 4rem">
+              <div style="margin: auto" class="spinner-2"></div>
+            </div>
+          </div>
+
+          <div
+            style="
+              margin-top: 8rem;
+              border-top-width: 1px;
+              border-top-style: solid;
+              border-top-color: #e5e7eb;
+            "
+          >
+            <div style="margin-top: 2rem">
+              <a href="$REDIRECT_URL" class="gotobutton"
+                >If you are not redirected shortly, click here
+                <span>&#10230;</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
+
+"""
+
+
 SUPPORTED_STATUS_CODES = {
+    "200": "OK",
     "301": "Moved Permanently",
     "302": "Found",
     "307": "Temporary Redirect",
@@ -90,10 +324,47 @@ def get_redirect_record(slug):
 
 
 # Return redirect
-def build_redirect(response, redirect_to_url, status_code="301"):
-    """Build the redirect response"""
+def build_og_redirect(response, redirect_record):
+    """Build the og redirect response"""
 
-    LOGGER.info(f"Build redirect to: {redirect_to_url}")
+    og_settings = redirect_record.get("OgSettings", {})
+    target_url = redirect_record.get("TargetUrl", {})
+
+    # pull og values
+    og_title = og_settings.get("OgTitle", "")
+    og_description = og_settings.get("OgDescription", "")
+    og_url = og_settings.get("OgUrl", "")
+    og_image = og_settings.get("OgImage", "")
+    og_image_alt = og_settings.get("OgImage_alt", "")
+
+    html_page = (
+        HTML_TEMPLATE.replace("$OG_TITLE", og_title)
+        .replace("$OG_DESCRIPTION", og_description)
+        .replace("$OG_URL", og_url)
+        .replace("$OG_IMAGE", og_image)
+        .replace("$OG_IMAGE_ALT", og_image_alt)
+        .replace("$$REDIRECT_URL", target_url)
+    )
+
+    response = {
+        "status": "200",
+        "statusDescription": "OK",
+        "headers": {
+            "cache-control": [{"key": "Cache-Control", "value": "max-age=100"}],
+            "content-type": [{"key": "Content-Type", "value": "text/html"}],
+        },
+        "body": html_page,
+    }
+
+    return response
+
+
+# Return redirect
+def build_direct_redirect(response, redirect_record, status_code="301"):
+    """Build the direct redirect response"""
+
+    redirect_to_url = redirect_record.get("TargetUrl")
+    LOGGER.info(f"Direct redirect to: {redirect_to_url}")
 
     response = {
         "status": status_code,
@@ -138,8 +409,7 @@ def make_response(cloudfront_event):
         redirect_record = {"TargetUrl": EXPIRED_REDIRECT}
 
     # Find target URL
-    redirect_to_url = redirect_record.get("TargetUrl")
-    LOGGER.info(f"Redirect to: {redirect_to_url}")
+    redirect_type = redirect_record.get("RedirectType")
 
     response = {
         "headers": request["headers"],
@@ -147,10 +417,15 @@ def make_response(cloudfront_event):
         "statusDescription": "OK",
     }
 
-    response_with_redirect = build_redirect(response, redirect_to_url)
-    LOGGER.info(f"Return response {response_with_redirect}")
+    # OG html type
+    if redirect_type == "OG_HTML":
+        response = build_og_redirect(response, redirect_record)
 
-    return response_with_redirect
+    # Direct type
+    else:
+        response = build_direct_redirect(response, redirect_record)
+
+    return response
 
 
 def handler(evt=None, ctx=None):
@@ -158,61 +433,18 @@ def handler(evt=None, ctx=None):
 
     LOGGER.info(f"FULL EVENT: {evt}")
 
-    html_page = """
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="utf-8" />
-        <!-- OG settings -->
-        <meta property="og:title" content="$OG_TITLE" />
-        <meta property="og:description" content="$OG_DESCRIPTION" />
-        <meta property="og:url" content="$OG_URL" />
-        <meta property="og:image" content="$OG_IMAGE" />
-        <meta property="og:image:alt" content="$OG_IMAGE_ALT" />
-        <meta property="og:type" content="website" />
-        <title>CurrentClient</title>
-    </head>
-    <body>
-        <p>welcome friend</p>
+    try:
+        #  Get the incoming request and the initial response from S3
+        #  https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/lambda-event-structure.html
+        cloudfront_event = evt["Records"][0]["cf"]
 
-        <a href="$REDIRECT_URL">Open my form</a>
-    </body>
-    </html>
-    """
+        res = make_response(cloudfront_event)
 
-    html_page = html_page.replace("$OG_TITLE", "title")
-    html_page = html_page.replace("$OG_DESCRIPTION", "description")
-    html_page = html_page.replace("$OG_URL", "url")
-    html_page = html_page.replace(
-        "$OG_IMAGE",
-        "https://img.ksl.com/mx/mplace-classifieds.ksl.com/1887550-1632239390-928894.jpg?filter=marketplace/664x500",
-    )
-    html_page = html_page.replace("$REDIRECT_URL", "https://www.currentclient.com/")
+        return res
 
-    response = {
-        "status": "200",
-        "statusDescription": "OK",
-        "headers": {
-            "cache-control": [{"key": "Cache-Control", "value": "max-age=100"}],
-            "content-type": [{"key": "Content-Type", "value": "text/html"}],
-        },
-        "body": html_page,
-    }
-
-    return response
-
-    # try:
-    #     #  Get the incoming request and the initial response from S3
-    #     #  https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/lambda-event-structure.html
-    #     cloudfront_event = evt["Records"][0]["cf"]
-
-    #     res = make_response(cloudfront_event)
-
-    #     return res
-
-    # except Exception as err:
-    #     LOGGER.error("Failed with error: %s", err)
-    #     raise err
+    except Exception as err:
+        LOGGER.error("Failed with error: %s", err)
+        raise err
 
 
 # Different handler for each env to handle
