@@ -65,9 +65,10 @@ class ShortUrlCreate(BaseModel):
     Properties to receive on shorturl creation
     """
 
-    RedirectType: Optional[RedirectTypeEnum]
     TargetUrl: HttpUrl
     NumDaysUntilExpire: int = 90
+    RedirectType: Optional[RedirectTypeEnum] = RedirectTypeEnum.DIRECT
+    OgSettings: Optional[OgSettings] = None
 
 
 class ShortUrlUpdate(ShortUrlCreate):

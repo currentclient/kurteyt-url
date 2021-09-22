@@ -113,7 +113,7 @@ Resources:
   # which is needed by cloudfront. Can increment the resource name
   # to get the new version created
   # ---------------------------------------------------------------------------
-  CloudfrontEdgeFunctionVersionB:
+  CloudfrontEdgeFunctionVersionA:
     Type: AWS::Lambda::Version
     Properties:
       # CodeSha256: String
@@ -158,7 +158,7 @@ Resources:
           MinTTL: 0
           LambdaFunctionAssociations:
             - EventType: viewer-request
-              LambdaFunctionARN: !Ref CloudfrontEdgeFunctionVersionB
+              LambdaFunctionARN: !Ref CloudfrontEdgeFunctionVersionA
           # OriginRequestPolicyId: String
           # RealtimeLogConfigArn: String
           # SmoothStreaming: Boolean
