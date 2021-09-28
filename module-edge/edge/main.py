@@ -29,6 +29,7 @@ HTML_TEMPLATE = """
 <html lang="en">
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
     <!-- OG settings -->
     <meta property="og:title" content="$OG_TITLE" />
     <meta property="og:description" content="$OG_DESCRIPTION" />
@@ -37,6 +38,11 @@ HTML_TEMPLATE = """
     <meta property="og:image:alt" content="$OG_IMAGE_ALT" />
     <meta property="og:type" content="website" />
     <title>CurrentClient</title>
+    <link
+      rel="stylesheet"
+      href="node_modules/modern-normalize/modern-normalize.css"
+    />
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -53,90 +59,18 @@ HTML_TEMPLATE = """
       window.onload = function () {
         // similar behavior as clicking on a link
         setTimeout(() => {
-          window.location.href = "$REDIRECT_URL";
+          // window.location.href = "$REDIRECT_URL";
+          window.location = "$REDIRECT_URL";
         }, 3000);
       };
     </script>
     <style>
-      /* RESET */
-      /* Box sizing rules */
-      *,
-      *::before,
-      *::after {
-        box-sizing: border-box;
+      html {
+        font-size: 16px;
       }
-
-      /* Remove default margin */
-      body,
-      h1,
-      h2,
-      h3,
-      h4,
-      p,
-      figure,
-      blockquote,
-      dl,
-      dd {
-        margin: 0;
-      }
-
-      /* Remove list styles on ul, ol elements with a list role, which suggests default styling will be removed */
-      ul[role="list"],
-      ol[role="list"] {
-        list-style: none;
-      }
-
-      /* Set core root defaults */
-      html:focus-within {
-        scroll-behavior: smooth;
-      }
-
-      /* Set core body defaults */
-      body {
-        min-height: 100vh;
-        text-rendering: optimizeSpeed;
-        line-height: 1.5;
-      }
-
-      /* A elements that don't have a class get default styles */
-      a:not([class]) {
-        text-decoration-skip-ink: auto;
-      }
-
-      /* Make images easier to work with */
-      img,
-      picture {
-        max-width: 100%;
-        display: block;
-      }
-
-      /* Inherit fonts for inputs and buttons */
-      input,
-      button,
-      textarea,
-      select {
-        font: inherit;
-      }
-
-      /* Remove all animations, transitions and smooth scroll for people that prefer not to see them */
-      @media (prefers-reduced-motion: reduce) {
-        html:focus-within {
-          scroll-behavior: auto;
-        }
-
-        *,
-        *::before,
-        *::after {
-          animation-duration: 0.01ms !important;
-          animation-iteration-count: 1 !important;
-          transition-duration: 0.01ms !important;
-          scroll-behavior: auto !important;
-        }
-      }
-
-      /* ^^^ RESET */
 
       body {
+        margin: 0px;
         font-family: "Inter", sans-serif;
       }
 
@@ -148,9 +82,10 @@ HTML_TEMPLATE = """
         color: #6b7280;
         padding: 0.5rem 1rem;
         border-radius: 4px;
+        font-size: 0.75rem;
       }
       .gotobutton:hover {
-        background-color: #e5e7eb;
+        background-color: #f4f4f5;
       }
 
       .gotobutton:active {
@@ -168,15 +103,15 @@ HTML_TEMPLATE = """
       }
 
       .spinner-2 {
-        width: 75px;
-        height: 75px;
+        width: 50px;
+        height: 50px;
         border-radius: 50%;
         background: radial-gradient(farthest-side, #3b82f6 94%, #0000) top/8px
-            12px no-repeat,
+            8px no-repeat,
           conic-gradient(#0000 30%, #3b82f6);
         -webkit-mask: radial-gradient(
           farthest-side,
-          #0000 calc(100% - 12px),
+          #0000 calc(100% - 8px),
           #000 0
         );
         animation: s3 1s infinite linear;
@@ -187,76 +122,152 @@ HTML_TEMPLATE = """
           transform: rotate(1turn);
         }
       }
+
+      .aspect-ratio-box {
+        width: 100%;
+        position: relative;
+      }
+
+      .aspect-ratio-box::after {
+        display: block;
+        content: "";
+        padding-bottom: 52.6%;
+      }
+
+      .aspect-ratio-box img {
+        position: absolute;
+        left: 0;
+        object-fit: cover;
+        top: 0;
+        width: 100%;
+        height: 100%;
+      }
+
+      .container {
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
+      }
+
+      .card {
+        position: relative;
+        overflow: hidden;
+        background: white;
+        border-width: 1px;
+        border-radius: 8px;
+        border-style: solid;
+        border-color: #e5e7eb;
+      }
+
+      .card + .card {
+        margin-top: 2rem;
+      }
     </style>
   </head>
   <body>
-    <div style="min-height: 100vh; padding: 2rem; display: flex">
+    <div style="min-height: 100vh">
+      <!-- colored header -->
       <div
         style="
-          flex: 1;
+          background-color: #eff6ff;
+          height: 36vh;
+          border-bottom-width: 1px;
+          border-style: solid;
+          border-color: #e5e7eb;
+        "
+      ></div>
+
+      <!-- upmargined form -->
+      <div
+        style="
           display: flex;
           flex-direction: column;
           align-items: center;
+          padding-left: 2rem;
+          padding-right: 2rem;
         "
       >
-        <div
-          style="
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            height: 100%;
-            max-width: 32rem;
-            border-radius: 8px;
-            border-width: 1px;
-            border-style: solid;
-            border-color: #e5e7eb;
-            padding-top: 2rem;
-            padding-bottom: 2rem;
-            padding-left: 4rem;
-            padding-right: 4rem;
-          "
-        >
-          <div style="overflow: hidden; border-radius: 4px">
-            <img
+        <div style="width: 100%; max-width: 32rem; margin-top: -32vh">
+          <!-- Text header -->
+          <div
+            style="
+              font-size: 1rem;
+              padding-top: 0.5rem;
+              text-align: left;
+              margin-bottom: 2rem;
+            "
+          >
+            <p style="font-size: 1rem; font-weight: 700; margin: 0">
+              $OG_TITLE
+            </p>
+            <p
               style="
-                height: 100%;
-                display: block;
-                object-fit: contain;
-                width: 400px;
-                padding-bottom: 2rem;
-                border-bottom-width: 1px;
-                border-bottom-style: solid;
-                border-bottom-color: #e5e7eb;
+                font-size: 0.8rem;
+                font-weight: 400;
+                margin: 0;
+                color: #6b7280;
+                padding-top: 0.5rem;
               "
-              src="$OG_IMAGE"
-              alt=""
-            />
+            >
+              $OG_DESCRIPTION
+            </p>
           </div>
 
-          <div>
-            <p style="font-size: 1.5rem; text-align: center; padding-top: 2rem">
-              Preparing your information now...
-            </p>
-            <div style="margin-top: 4rem">
-              <div style="margin: auto" class="spinner-2"></div>
+          <!-- Image header -->
+          <div class="card">
+            <div class="aspect-ratio-box">
+              <img src="$OG_IMAGE" alt="$OG_IMAGE_ALT" />
             </div>
           </div>
 
-          <div
-            style="
-              margin-top: 8rem;
-              border-top-width: 1px;
-              border-top-style: solid;
-              border-top-color: #e5e7eb;
-            "
-          >
-            <div style="margin-top: 2rem">
+          <!-- Loading -->
+
+          <div class="card">
+            <div
+              class="container"
+              style="padding-top: 1rem; padding-bottom: 2rem"
+            >
+              <p style="font-size: 1rem; text-align: center">
+                Preparing your information...
+              </p>
+              <div style="margin-top: 2rem">
+                <div style="margin: auto" class="spinner-2"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Redirect -->
+
+          <div class="card">
+            <div
+              class="container"
+              style="padding-top: 1rem; padding-bottom: 1rem"
+            >
               <a href="$REDIRECT_URL" class="gotobutton"
-                >If you are not redirected shortly, click here
+                >Click here if you are not redirected
                 <span>&#10230;</span>
               </a>
             </div>
           </div>
+        </div>
+
+        <div>
+          <p
+            style="
+              font-size: smaller;
+              margin-top: 2rem;
+              margin-bottom: 1rem;
+              color: #6b7280;
+            "
+          >
+            Running on
+            <strong
+              ><a
+                style="text-decoration: none; color: #6b7280 !important"
+                href="https://currentclient.com"
+                >CurrentClient</a
+              ></strong
+            >
+          </p>
         </div>
       </div>
     </div>
