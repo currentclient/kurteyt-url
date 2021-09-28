@@ -3,6 +3,7 @@
 import datetime
 import random
 import string
+from enum import Enum
 from typing import Optional
 
 from fastapi.encoders import jsonable_encoder
@@ -14,6 +15,28 @@ from app.core.logger import get_logger
 LOGGER = get_logger(__name__)
 
 
+class RedirectTypeEnum(str, Enum):
+    """Types of redirect options"""
+
+    DIRECT = "DIRECT"
+    OG_HTML = "OG_HTML"  # open graph html page
+
+
+class OgSettings(BaseModel):
+    """
+    OgSettings
+
+    Base shorturl contains the target url and the short url that will
+    redirect to it.
+    """
+
+    OgTitle: str
+    OgDescription: str
+    OgUrl: str
+    OgImage: str
+    OgImageAlt: str
+
+
 class ShortUrlBase(BaseModel):
     """
     ShortUrlBase
@@ -22,10 +45,12 @@ class ShortUrlBase(BaseModel):
     redirect to it.
     """
 
+    RedirectType: Optional[RedirectTypeEnum] = RedirectTypeEnum.DIRECT
     TargetUrl: Optional[HttpUrl] = None
     ShortId: Optional[str] = None
     NumDaysUntilExpire: Optional[int] = None
     TTL: Optional[int] = None
+    OgSettings: Optional[OgSettings]
 
     @classmethod
     def make_pk(cls, short_id: str):
@@ -42,6 +67,8 @@ class ShortUrlCreate(BaseModel):
 
     TargetUrl: HttpUrl
     NumDaysUntilExpire: int = 90
+    RedirectType: Optional[RedirectTypeEnum] = RedirectTypeEnum.DIRECT
+    OgSettings: Optional[OgSettings]
 
 
 class ShortUrlUpdate(ShortUrlCreate):
