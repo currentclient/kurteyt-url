@@ -143,7 +143,7 @@ functions:
           - "cognito-idp:AdminInitiateAuth"
           - "cognito-idp:AdminGetUser"
         Resource:
-          - !Sub "arn:aws:cognito-idp:${param:cognitoRegion}:${AWS::AccountId}:userpool/${:param:cognitoUserPoolId}"
+          - !Sub "arn:aws:cognito-idp:${param:cognitoRegion}:${AWS::AccountId}:userpool/${param:cognitoUserPoolId}"
     events:
       # Priority 1 - Allow CORS options calls
       - httpApi:
