@@ -44,7 +44,7 @@ params:
     cognitoRegion: us-west-2
     domainName: becurrent.io
     domainNameApi: api.becurrent.io
-    # domainNameCertArn: ${ssm:/cc/east/prd/acm/arn/becurrent}
+    domainNameCertArn: ${ssm:/cc/east/prd/acm/arn/becurrent}
 
   dev:
     edgeHandler: edge.main.handler_dev
