@@ -41,6 +41,7 @@ params:
     cognitoUserPoolClientsInternal: ldnr04o1efig1kbbu2kgdfj84
     cognitoUserPool: https://cognito-idp.us-west-2.amazonaws.com/us-west-2_pDUWHeGaJ
     cognitoUserPoolId: us-west-2_pDUWHeGaJ
+    cognitoRegion: us-west-2
     domainName: becurrent.io
     domainNameApi: api.becurrent.io
     # domainNameCertArn: ${ssm:/cc/east/prd/acm/arn/becurrent}
@@ -52,6 +53,7 @@ params:
     cognitoUserPoolClientsInternal: 5eld701ippd7d0d8nugdkvtcl1
     cognitoUserPool: https://cognito-idp.us-west-2.amazonaws.com/us-west-2_prmFZ0Fif
     cognitoUserPoolId: us-west-2_prmFZ0Fif
+    cognitoRegion: us-west-2
     domainName: cclient.io
     domainNameApi: api.cclient.io
     domainNameCertArn: ${ssm:/cc/east/dev/acm/arn/short}
@@ -135,6 +137,13 @@ functions:
           - "dynamodb:DeleteItem"
         Resource:
           - !GetAtt KurteytTable.Arn
+      - Sid: "AllowCognitoAuth"
+        Effect: "Allow"
+        Action:
+          - "cognito-idp:AdminInitiateAuth"
+          - "cognito-idp:AdminGetUser"
+        Resource:
+          - !Sub "arn:aws:cognito-idp:${param:cognitoRegion}:${AWS::AccountId}:userpool/${:param:cognitoUserPoolId}"
     events:
       # Priority 1 - Allow CORS options calls
       - httpApi:
