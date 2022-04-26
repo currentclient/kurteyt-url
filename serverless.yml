@@ -45,6 +45,24 @@ custom:
       domainNameCertArn: ${ssm:/cc/east/${self:provider.stage}/acm/arn/${env:DOMAIN_NAME_CERT_LOOKUP}}
       # Bucket for logs
       bucketNameWebLogs: ${self:custom.naming.type.bucket}-kurteyt-logs
+  dependencies:
+    cognitoUserPoolId:
+      dev: us-west-2_prmFZ0Fif
+      prd: us-west-2_pDUWHeGaJ
+    cognitoUserPoolGroupUsersId: users
+    cognitoUserPoolGroupGovernorId: governors
+    cognitoUserPool:
+      dev: https://cognito-idp.${self:provider.region}.amazonaws.com/us-west-2_prmFZ0Fif
+      prd: https://cognito-idp.${self:provider.region}.amazonaws.com/us-west-2_pDUWHeGaJ
+    cognitoUserPoolClients:
+      dev:
+        web: 6ucccdh6bialie4tjsibe0v9e0
+        services: 6dat4ip3ivr1b7sb4r5bcbqh09
+        internal: 5eld701ippd7d0d8nugdkvtcl1
+      prd:
+        web: 26mf5j64glf9ri02fmpjqqgkhk
+        services: 3m83rvmir1a7qo8npivnci89a1
+        internal: ldnr04o1efig1kbbu2kgdfj84
   edgeHandler:
     dev: edge.main.handler_dev
     prd: edge.main.handler_prd
@@ -105,6 +123,20 @@ provider:
     # Use custom name for the API Gateway API
     name: ${self:custom.naming.use.apiName}
     payload: "2.0"
+    authorizers:
+      # JWT authorizers to back HTTP API endpoints
+      cognitoJwtAuthorizer:
+        # Point request header at which JWT token will be provided
+        identitySource: $request.header.Authorization
+        # Issuer url, in case of Cognito User Pools url will be like:
+        # https://cognito-idp.${region}.amazonaws.com/${cognitoPoolId}
+        issuerUrl: ${self:custom.dependencies.cognitoUserPool.${self:provider.stage}}
+        # Audience for which access is intended
+        # In case of Cognito User Pools we need to list client ids
+        audience:
+          - "${self:custom.dependencies.cognitoUserPoolClients.${self:provider.stage}.web}"
+          - "${self:custom.dependencies.cognitoUserPoolClients.${self:provider.stage}.services}"
+          - "${self:custom.dependencies.cognitoUserPoolClients.${self:provider.stage}.internal}"
 
 package:
   individually: true
@@ -140,11 +172,19 @@ functions:
       - httpApi:
           path: /api/v1/{proxy+}
           method: "OPTIONS"
-      # Priority 2 - Authenticated Routes to api
+      # Priority 2 - Allow public level calls
+      - httpApi:
+          path: /api/v1/public/{proxy+}
+          method: "*"
+      # Priority 3 - Authenticated Routes to api
       - httpApi:
           path: /api/{proxy+}
           method: "*"
-      # Priority 3 - Allow top level GETS
+          authorizer:
+            name: cognitoJwtAuthorizer
+            scopes: # Optional
+              - aws.cognito.signin.user.admin
+      # Priority 4 - Allow top level GETS
       - httpApi:
           path: /{proxy+}
           method: "GET"
