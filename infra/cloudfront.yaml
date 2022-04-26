@@ -20,7 +20,7 @@ Resources:
         ServerSideEncryptionConfiguration:
           - ServerSideEncryptionByDefault:
               SSEAlgorithm: AES256
-      BucketName: ${self:custom.naming.use.bucketNameWebLogs}
+      BucketName: ${param:bucketNameWebLogs}
       # CorsConfiguration:
       #   CorsConfiguration
       # InventoryConfigurations:
@@ -67,7 +67,7 @@ Resources:
   CloudfrontEdgeFunctionRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: ${self:custom.naming.use.lambdaRoleKurteytEdge}
+      RoleName: ${param:lambdaRoleKurteytEdge}
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:
@@ -88,11 +88,11 @@ Resources:
                   - logs:CreateLogStream
                   - logs:PutLogEvents
                 Resource:
-                  - !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${self:custom.naming.use.lambdaNameKurteytEdge}:*"
-                  - !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${self:custom.naming.use.lambdaNameKurteytEdge}:*:*"
+                  - !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${param:lambdaNameKurteytEdge}:*"
+                  - !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${param:lambdaNameKurteytEdge}:*:*"
                   # Lambda at edge creates log group for each region that the lambda is pushed to
-                  - !Sub "arn:aws:logs:*:${AWS::AccountId}:log-group:/aws/lambda/*.${self:custom.naming.use.lambdaNameKurteytEdge}:*"
-                  - !Sub "arn:aws:logs:*:${AWS::AccountId}:log-group:/aws/lambda/*.${self:custom.naming.use.lambdaNameKurteytEdge}:*:*"
+                  - !Sub "arn:aws:logs:*:${AWS::AccountId}:log-group:/aws/lambda/*.${param:lambdaNameKurteytEdge}:*"
+                  - !Sub "arn:aws:logs:*:${AWS::AccountId}:log-group:/aws/lambda/*.${param:lambdaNameKurteytEdge}:*:*"
 
         - PolicyName: AllowKurteytTableCRUD
           PolicyDocument:
@@ -130,7 +130,7 @@ Resources:
     Properties:
       DistributionConfig:
         Aliases:
-          - ${self:custom.naming.use.domainName}
+          - ${param:domainName}
         # CacheBehaviors:
         #   - CacheBehavior
         # Comment: String
@@ -190,7 +190,7 @@ Resources:
               OriginReadTimeout: 15 # 30 seconds default
               OriginSSLProtocols:
                 - TLSv1.2
-            DomainName: ${self:custom.naming.use.domainNameApi}
+            DomainName: ${param:domainNameApi}
             Id:
               Fn::Sub: API-root
             # OriginCustomHeaders:
@@ -202,7 +202,7 @@ Resources:
         # Restrictions:
         #   Restrictions
         ViewerCertificate:
-          AcmCertificateArn: ${self:custom.naming.use.domainNameCertArn}
+          AcmCertificateArn: ${param:domainNameCertArn}
           MinimumProtocolVersion: TLSv1.2_2019
           SslSupportMethod: sni-only
         # WebACLId: String
