@@ -2,100 +2,68 @@
 service: kurteyt-url
 
 # Pin framework version
-frameworkVersion: ">=2.0.0"
+frameworkVersion: "3"
 
 plugins:
   - serverless-python-requirements
   - serverless-iam-roles-per-function
-  - serverless-dotenv-plugin
-  # - serverless-dynamodb-local
 
-# Custom variables, try to put config variable names here, for easy reference
 custom:
-  # Naming conventions helpers
-  naming:
-    regionTranslation:
-      us-east-1: east
-    # Prefix for the org
-    org: cc
-    region: ${self:custom.naming.regionTranslation.${self:provider.region}}
-    prefix: ${self:custom.naming.org}-${self:custom.naming.region}-${self:provider.stage} # cc-west-dev
-    prefixParm: /${self:custom.naming.org}/${self:custom.naming.region}/${self:provider.stage} # /cc/west/dev
-    type:
-      stack: ${self:custom.naming.prefix}-stack
-      api: ${self:custom.naming.prefix}-api
-      lambda: ${self:custom.naming.prefix}-lambda
-      role: ${self:custom.naming.prefix}-role
-      db: ${self:custom.naming.prefix}-db
-      bucket: ${self:custom.naming.prefix}-bucket
-    use:
-      # Name of the cloudformation stack
-      stackName: ${self:custom.naming.type.stack}-kurteyt
-      # Name of the api
-      apiName: ${self:custom.naming.type.api}-kurteyt
-      # Name of the lambda
-      lambdaNameKurteytApi: ${self:custom.naming.type.lambda}-kurteyt-api
-      lambdaRoleKurteytApi: ${self:custom.naming.type.role}-kurteyt-api
-      lambdaNameKurteytEdge: ${self:custom.naming.type.lambda}-kurteyt-edge
-      lambdaRoleKurteytEdge: ${self:custom.naming.type.role}-kurteyt-edge
-      # Name of the table
-      tableNameKurteyt: ${self:custom.naming.type.db}-kurteyt
-      domainName: ${env:DOMAIN_NAME}
-      domainNameApi: api.${env:DOMAIN_NAME}
-      domainNameCertArn: ${ssm:/cc/east/${self:provider.stage}/acm/arn/${env:DOMAIN_NAME_CERT_LOOKUP}}
-      # Bucket for logs
-      bucketNameWebLogs: ${self:custom.naming.type.bucket}-kurteyt-logs
-  dependencies:
-    cognitoUserPoolId:
-      dev: us-west-2_prmFZ0Fif
-      prd: us-west-2_pDUWHeGaJ
-    cognitoUserPoolGroupUsersId: users
-    cognitoUserPoolGroupGovernorId: governors
-    cognitoUserPool:
-      dev: https://cognito-idp.us-west-2.amazonaws.com/us-west-2_prmFZ0Fif
-      prd: https://cognito-idp.us-west-2.amazonaws.com/us-west-2_pDUWHeGaJ
-    cognitoUserPoolClients:
-      dev:
-        web: 6ucccdh6bialie4tjsibe0v9e0
-        services: 6dat4ip3ivr1b7sb4r5bcbqh09
-        internal: 5eld701ippd7d0d8nugdkvtcl1
-      prd:
-        web: 26mf5j64glf9ri02fmpjqqgkhk
-        services: 3m83rvmir1a7qo8npivnci89a1
-        internal: ldnr04o1efig1kbbu2kgdfj84
-  edgeHandler:
-    dev: edge.main.handler_dev
-    prd: edge.main.handler_prd
   # Plugin options
-  dotenv:
-    # default: project root
-    # Lambda at edge functions cannot have variables
-    include:
-      - []
-  # serverless-iam-roles-per-function:
-  #   defaultInherit: true
   pythonRequirements:
     # Not going to use poetry, will manage the requirements file for each seperate
     # function
     usePoetry: false
     slim: true
-    # Will default to using the app requirements. This allows the app function to be
-    # packaged without using the 'module' property, which when used, removes the folder
-    # app, so it doesnt play nice.
-    # fileName: app/requirements.txt
-  serverless-offline:
-    noPrependStageInUrl: true
-    ignoreJWTSignature: true
-    # noAuth: true
-    httpPort: 8001
+
+params:
+  default:
+    cognitoUserPoolGroupUsersId: users
+    cognitoUserPoolGroupGovernorId: governors
+    # Name of the cloudformation stack
+    stackName: cc-east-${self:provider.stage}-stack-kurteyt
+    # Name of the api
+    apiName: cc-east-${self:provider.stage}-api-kurteyt
+    # Name of the lambda
+    lambdaNameKurteytApi: cc-east-${self:provider.stage}-lambda-kurteyt-api
+    lambdaRoleKurteytApi: cc-east-${self:provider.stage}-role-kurteyt-api
+    lambdaNameKurteytEdge: cc-east-${self:provider.stage}-lambda-kurteyt-edge
+    lambdaRoleKurteytEdge: cc-east-${self:provider.stage}-role-kurteyt-edge
+    # Name of the table
+    tableNameKurteyt: cc-east-${self:provider.stage}-db-kurteyt
+    # Bucket for logs
+    bucketNameWebLogs: cc-east-${self:provider.stage}-bucket-kurteyt-logs
+
+  prd:
+    edgeHandler: edge.main.handler_prd
+    cognitoUserPoolClientsWeb: 26mf5j64glf9ri02fmpjqqgkhk
+    cognitoUserPoolClientsServices: 3m83rvmir1a7qo8npivnci89a1
+    cognitoUserPoolClientsInternal: ldnr04o1efig1kbbu2kgdfj84
+    cognitoUserPool: https://cognito-idp.us-west-2.amazonaws.com/us-west-2_pDUWHeGaJ
+    cognitoUserPoolId: us-west-2_pDUWHeGaJ
+    domainName: becurrent.io
+    domainNameApi: api.becurrent.io
+    # domainNameCertArn: ${ssm:/cc/east/prd/acm/arn/becurrent}
+
+  dev:
+    edgeHandler: edge.main.handler_dev
+    cognitoUserPoolClientsWeb: 6ucccdh6bialie4tjsibe0v9e0
+    cognitoUserPoolClientsServices: 6dat4ip3ivr1b7sb4r5bcbqh09
+    cognitoUserPoolClientsInternal: 5eld701ippd7d0d8nugdkvtcl1
+    cognitoUserPool: https://cognito-idp.us-west-2.amazonaws.com/us-west-2_prmFZ0Fif
+    cognitoUserPoolId: us-west-2_prmFZ0Fif
+    domainName: cclient.io
+    domainNameApi: api.cclient.io
+    domainNameCertArn: ${ssm:/cc/east/dev/acm/arn/short}
 
 provider:
   name: aws
   region: "us-east-1"
   stage: ${opt:stage, 'dev'}
-  stackName: ${self:custom.naming.use.stackName}
+  stackName: ${param:stackName}
   stackTags: ${file(./tags.yml)}
   runtime: python3.8
+  logRetentionInDays: 7
   timeout: 26 # HTTP api timeout is 29s
   memorySize: 128
   versionFunctions: false
@@ -109,7 +77,7 @@ provider:
       allowedOrigins:
         - http://localhost:8000
         - http://0.0.0.0:8000
-        - https://${env:DOMAIN_NAME}
+        - https://${param:domainName}
       allowedHeaders:
         - Content-Type
         - Authorization
@@ -121,7 +89,7 @@ provider:
         - X-Amz-User-Agent
       allowCredentials: true
     # Use custom name for the API Gateway API
-    name: ${self:custom.naming.use.apiName}
+    name: ${param:apiName}
     payload: "2.0"
     authorizers:
       # JWT authorizers to back HTTP API endpoints
@@ -130,28 +98,28 @@ provider:
         identitySource: $request.header.Authorization
         # Issuer url, in case of Cognito User Pools url will be like:
         # https://cognito-idp.${region}.amazonaws.com/${cognitoPoolId}
-        issuerUrl: ${self:custom.dependencies.cognitoUserPool.${self:provider.stage}}
+        issuerUrl: ${param:cognitoUserPool}
         # Audience for which access is intended
         # In case of Cognito User Pools we need to list client ids
         audience:
-          - "${self:custom.dependencies.cognitoUserPoolClients.${self:provider.stage}.web}"
-          - "${self:custom.dependencies.cognitoUserPoolClients.${self:provider.stage}.services}"
-          - "${self:custom.dependencies.cognitoUserPoolClients.${self:provider.stage}.internal}"
+          - ${param:cognitoUserPoolClientsWeb}
+          - ${param:cognitoUserPoolClientsServices}
+          - ${param:cognitoUserPoolClientsInternal}
 
 package:
   individually: true
 
 functions:
   app:
-    name: ${self:custom.naming.use.lambdaNameKurteytApi}
+    name: ${param:lambdaNameKurteytApi}
     description: kurteyts url api
     memorySize: 512
     handler: app.main.handler
     module: module-app
     environment:
       LOG_AT_LEVEL: DEBUG
-      KURTEYT_TABLE: ${self:custom.naming.use.tableNameKurteyt}
-    iamRoleStatementsName: ${self:custom.naming.use.lambdaRoleKurteytApi}
+      KURTEYT_TABLE: ${param:tableNameKurteyt}
+    iamRoleStatementsName: ${param:lambdaRoleKurteytApi}
     iamRoleStatementsInherit: true
     iamRoleStatements:
       - Sid: "AllowKurteytTableCRUD"
@@ -190,15 +158,14 @@ functions:
           method: "GET"
 
   edge:
-    name: ${self:custom.naming.use.lambdaNameKurteytEdge}
+    name: ${param:lambdaNameKurteytEdge}
     description: processes viewer request on cloudfront, handles redirect or passthrough
-    handler: ${self:custom.edgeHandler.${self:provider.stage}} # dev or prd handler to hardcode the table name in
+    handler: ${param:edgeHandler} # dev or prd handler to hardcode the table name in
     module: module-edge
     # versionFunctions: true
     timeout: 3
     memorySize: 128
     role: !GetAtt CloudfrontEdgeFunctionRole.Arn
-
 # Resources
 resources:
   - ${file(infra/table.yaml)}

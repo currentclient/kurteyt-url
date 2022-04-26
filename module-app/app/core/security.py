@@ -73,7 +73,6 @@ class JWTBearer(HTTPBearer):
             )
         except Exception as err:
             LOGGER.exception(err)
-            raise HTTPException(
-                status_code=HTTP_403_FORBIDDEN, detail="Not Authorized")
+            raise HTTPException(status_code=HTTP_403_FORBIDDEN, detail="Not Authorized")
 
         return jwt_credentials

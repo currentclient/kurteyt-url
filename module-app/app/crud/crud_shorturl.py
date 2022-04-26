@@ -6,7 +6,7 @@ Provides shorturls crud operations.
 
 from os import environ
 
-from app import exceptions, models
+from app import database, exceptions, models
 from app.core.logger import get_logger
 from app.crud.base import CRUDBase
 
@@ -66,11 +66,22 @@ class CRUDShortUrl(
                 create_model=obj_in_create
             )
 
-            obj_in_db_res = self.create(obj_in_db=obj_in_db)
+            # Add conditional, as to not overwrite this broadcast if already existing
+            condition_expression = database.ConditionExpression(
+                Attribute="PK",
+                Operator=database.ConditionExpressionOperator.NOT_EXISTS,
+            )
+
+            obj_in_db_res = self.create(
+                obj_in_db=obj_in_db, condition_expression=condition_expression
+            )
 
             # Return object
             return obj_in_db_res
 
+        except (exceptions.CreateRecordConditionFailed,) as err:
+            LOGGER.exception(err)
+            raise err
         except (
             exceptions.ConvertToJsonFailed,
             exceptions.CreateRecordFailed,

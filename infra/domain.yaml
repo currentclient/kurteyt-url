@@ -6,10 +6,10 @@ Resources:
   ApiDomainName:
     Type: AWS::ApiGatewayV2::DomainName
     Properties:
-      DomainName: ${self:custom.naming.use.domainNameApi}
+      DomainName: ${param:domainNameApi}
       DomainNameConfigurations:
         - EndpointType: REGIONAL
-          CertificateArn: ${self:custom.naming.use.domainNameCertArn}
+          CertificateArn: ${param:domainNameCertArn}
           # CertificateName: customer
       # MutualTlsAuthentication:
       #   MutualTlsAuthentication

@@ -16,11 +16,8 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "gitmoji-cli": "^3.2.12",
-    "serverless": "~2.4.0",
-    "serverless-dotenv-plugin": "^3.8.0",
-    "serverless-iam-roles-per-function": "^2.0.2",
-    "serverless-offline": "^6.5.0",
-    "serverless-python-requirements": "^5.1.0"
+    "serverless": "^3.7.1",
+    "serverless-iam-roles-per-function": "^3.2.0",
+    "serverless-python-requirements": "^5.3.1"
   }
 }

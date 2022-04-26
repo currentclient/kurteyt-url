@@ -34,6 +34,11 @@ def create_shorturl(
 
         return shorturl
 
+    except (exceptions.CreateRecordConditionFailed) as err:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Short url already exists",
+        )
     except (exceptions.ConvertToJsonFailed, exceptions.CreateRecordFailed) as err:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=err.message

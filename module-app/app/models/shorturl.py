@@ -66,6 +66,7 @@ class ShortUrlCreate(BaseModel):
     """
 
     TargetUrl: HttpUrl
+    ShortId: Optional[str] = None
     NumDaysUntilExpire: int = 90
     RedirectType: Optional[RedirectTypeEnum] = RedirectTypeEnum.DIRECT
     OgSettings: Optional[OgSettings]
@@ -130,7 +131,8 @@ def convert_shorturlcreate_to_shorturlindb(
     """Convert ShortUrlCreate => ShortUrlInDB model"""
 
     # Generate unique url slug
-    short_id = random_alnum(size=8)
+    if not create_model.ShortId:
+        create_model.ShortId = random_alnum(size=8)
 
     expire_datetime = datetime.datetime.today() + datetime.timedelta(
         days=create_model.NumDaysUntilExpire
@@ -144,11 +146,10 @@ def convert_shorturlcreate_to_shorturlindb(
         # Add shorturl create values
         **jsonable_encoder(create_model),
         # Add Ids
-        ShortId=short_id,
         TTL=expire_ttl,
         CreatedAt=current_timestamp,
         # Add pk and sk for dynamodb access patterns
-        PK=ShortUrlBase.make_pk(short_id=short_id),
+        PK=ShortUrlBase.make_pk(short_id=create_model.ShortId),
     )
 
     return indb_model
