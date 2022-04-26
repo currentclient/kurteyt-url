@@ -44,6 +44,7 @@ params:
     cognitoRegion: us-west-2
     domainName: becurrent.io
     domainNameApi: api.becurrent.io
+    # TODO https://github.com/serverless/serverless/issues/10671
     domainNameCertArn: ${ssm:/cc/east/prd/acm/arn/becurrent}
 
   dev:
