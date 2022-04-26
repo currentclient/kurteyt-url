@@ -56,8 +56,7 @@ params:
     cognitoRegion: us-west-2
     domainName: cclient.io
     domainNameApi: api.cclient.io
-    # domainNameCertArn: ${ssm:/cc/east/dev/acm/arn/short}
-    domainNameCertArn: arn:aws:acm:us-east-1:288020343544:certificate/58432d40-bcd8-49e3-8831-4b7769eb58c4
+    domainNameCertArn: ${ssm:/cc/east/dev/acm/arn/short}
 
 provider:
   name: aws
