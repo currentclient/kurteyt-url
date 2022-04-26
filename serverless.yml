@@ -52,8 +52,8 @@ custom:
     cognitoUserPoolGroupUsersId: users
     cognitoUserPoolGroupGovernorId: governors
     cognitoUserPool:
-      dev: https://cognito-idp.${self:provider.region}.amazonaws.com/us-west-2_prmFZ0Fif
-      prd: https://cognito-idp.${self:provider.region}.amazonaws.com/us-west-2_pDUWHeGaJ
+      dev: https://cognito-idp.us-west-2.amazonaws.com/us-west-2_prmFZ0Fif
+      prd: https://cognito-idp.us-west-2.amazonaws.com/us-west-2_pDUWHeGaJ
     cognitoUserPoolClients:
       dev:
         web: 6ucccdh6bialie4tjsibe0v9e0
