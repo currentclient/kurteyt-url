@@ -31,12 +31,12 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.PRD_AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.PRD_AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-west-2
+          aws-region: us-east-1
 
       - name: Install
         run: |
           npm install
 
-      - name: Deploy West
+      - name: Deploy East
         run: |
           npm run deploy
