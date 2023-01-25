@@ -202,7 +202,7 @@ Resources:
         # Restrictions:
         #   Restrictions
         ViewerCertificate:
-          DomainName: ${param:domainNameCertArn}
+          AcmCertificateArn: ${param:domainNameCertArn}
           MinimumProtocolVersion: TLSv1.2_2019
           SslSupportMethod: sni-only
         # WebACLId: String
