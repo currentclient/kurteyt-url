@@ -9,7 +9,7 @@ Resources:
       DomainName: ${param:domainNameApi}
       DomainNameConfigurations:
         - EndpointType: REGIONAL
-          CertificateArn: ${self:custom.dependencies.domainNameCertArn.${self:provider.stage}}
+          CertificateArn: ${param:domainNameCertArn}
           # CertificateName: customer
       # MutualTlsAuthentication:
       #   MutualTlsAuthentication

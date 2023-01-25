@@ -16,9 +16,9 @@ custom:
     usePoetry: false
     slim: true
   dependencies:
-    domainNameCertArn:
-      dev: ${ssm:/cc/east/dev/acm/arn/short}
-      prd: ${ssm:/cc/east/prd/acm/arn/becurrent}
+    domainNameCertSsmName:
+      dev: /cc/east/dev/acm/arn/short
+      prd: /cc/east/prd/acm/arn/becurrent
 
 params:
   default:
@@ -37,7 +37,7 @@ params:
     tableNameKurteyt: cc-east-${self:provider.stage}-db-kurteyt
     # Bucket for logs
     bucketNameWebLogs: cc-east-${self:provider.stage}-bucket-kurteyt-logs
-    acmCertArn: ${ssm:/cc/west/${self:provider.stage}/acm/arn/api}
+    domainNameCertArn: ${ssm:${self:custom.dependencies.domainNameCertSsmName.${self:provider.stage}}}
 
   prd:
     edgeHandler: edge.main.handler_prd
