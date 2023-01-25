@@ -15,6 +15,10 @@ custom:
     # function
     usePoetry: false
     slim: true
+  dependencies:
+    domainNameCertArn:
+      dev: ${ssm:/cc/east/dev/acm/arn/short}
+      prd: ${ssm:/cc/east/prd/acm/arn/becurrent}
 
 params:
   default:
@@ -33,6 +37,7 @@ params:
     tableNameKurteyt: cc-east-${self:provider.stage}-db-kurteyt
     # Bucket for logs
     bucketNameWebLogs: cc-east-${self:provider.stage}-bucket-kurteyt-logs
+    acmCertArn: ${ssm:/cc/west/${self:provider.stage}/acm/arn/api}
 
   prd:
     edgeHandler: edge.main.handler_prd
@@ -44,8 +49,6 @@ params:
     cognitoRegion: us-west-2
     domainName: becurrent.io
     domainNameApi: api.becurrent.io
-    # TODO https://github.com/serverless/serverless/issues/10671
-    domainNameCertArn: ${ssm:/cc/east/prd/acm/arn/becurrent}
 
   dev:
     edgeHandler: edge.main.handler_dev
@@ -57,7 +60,6 @@ params:
     cognitoRegion: us-west-2
     domainName: cclient.io
     domainNameApi: api.cclient.io
-    domainNameCertArn: ${ssm:/cc/east/dev/acm/arn/short}
 
 provider:
   name: aws
