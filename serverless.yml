@@ -15,6 +15,10 @@ custom:
     # function
     usePoetry: false
     slim: true
+  dependencies:
+    domainNameCertSsmName:
+      dev: /cc/east/dev/acm/arn/short
+      prd: /cc/east/prd/acm/arn/becurrent
 
 params:
   default:
@@ -33,6 +37,7 @@ params:
     tableNameKurteyt: cc-east-${self:provider.stage}-db-kurteyt
     # Bucket for logs
     bucketNameWebLogs: cc-east-${self:provider.stage}-bucket-kurteyt-logs
+    domainNameCertArn: ${ssm:${self:custom.dependencies.domainNameCertSsmName.${self:provider.stage}}}
 
   prd:
     edgeHandler: edge.main.handler_prd
@@ -44,7 +49,6 @@ params:
     cognitoRegion: us-west-2
     domainName: becurrent.io
     domainNameApi: api.becurrent.io
-    domainNameCertArn: ${ssm:/cc/east/prd/acm/arn/becurrent}
 
   dev:
     edgeHandler: edge.main.handler_dev
@@ -56,8 +60,6 @@ params:
     cognitoRegion: us-west-2
     domainName: cclient.io
     domainNameApi: api.cclient.io
-    # domainNameCertArn: ${ssm:/cc/east/dev/acm/arn/short}
-    domainNameCertArn: arn:aws:acm:us-east-1:288020343544:certificate/58432d40-bcd8-49e3-8831-4b7769eb58c4
 
 provider:
   name: aws

@@ -478,7 +478,7 @@ def handler_dev(evt=None, ctx=None):
     global KERTEYT_TABLE_NAME
     global EXPIRED_REDIRECT
     KERTEYT_TABLE_NAME = "cc-east-dev-db-kurteyt"
-    EXPIRED_REDIRECT = "https://demo.currentclient.io/expired"
+    EXPIRED_REDIRECT = "https://client.currentclient.io/expired"
     return handler(evt, ctx)
 
 
@@ -487,5 +487,5 @@ def handler_prd(evt=None, ctx=None):
     global KERTEYT_TABLE_NAME
     global EXPIRED_REDIRECT
     KERTEYT_TABLE_NAME = "cc-east-prd-db-kurteyt"
-    EXPIRED_REDIRECT = "https://app.currentclient.com/expired"
+    EXPIRED_REDIRECT = "https://client.currentclient.com/expired"
     return handler(evt, ctx)
