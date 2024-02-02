@@ -8,6 +8,7 @@
     "package": "serverless package --verbose --force --stage $TARGET_ENV",
     "remove": "serverless remove --verbose --force --stage $TARGET_ENV",
     "up": "docker-compose up --build",
+    "up:prd": "docker-compose -f docker-compose.yml -f docker-compose.prd.yml up --build",
     "down": "docker-compose down",
     "box": "docker exec -it kurteyt-url_api_1 /bin/bash",
     "local:offline": "serverless offline",

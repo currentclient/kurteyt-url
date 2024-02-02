@@ -34,8 +34,8 @@
             ]
           },
           "method": "GET",
-          "querystring": "/URoAwvmT",
-          "uri": "/URoAwvmT"
+          "querystring": "MEETING",
+          "uri": "meeting"
         }
       }
     }
