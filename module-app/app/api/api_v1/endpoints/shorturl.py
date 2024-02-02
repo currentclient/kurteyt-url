@@ -71,11 +71,11 @@ def read_shorturl(
 
 
 @router.get(
-    "/s/{id}",
+    "/u/{id}",
     response_model=models.ShortUrl,
     responses=common_400_and_500,
 )
-def read_s_shorturl(
+def read_user_shorturl(
     *,
     short_id: str = Path(..., alias="id"),
 ) -> Any:
@@ -83,12 +83,13 @@ def read_s_shorturl(
     # Added this to suppor the s/ lookups
     LOGGER.debug(
         (
-            "Function: read_s_shorturl |",
+            "Function: read_user_shorturl |",
             f"short_id: {short_id}",
         )
     )
 
-    full_user_id = f"s/{short_id}"
+    # Add back the u since it got pulled out with the params
+    full_user_id = f"u/{short_id}"
 
     # Get shorturl
     shorturl_in_db = _get_shorturl(short_id=full_user_id)

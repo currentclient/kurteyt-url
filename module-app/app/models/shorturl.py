@@ -161,12 +161,12 @@ def convert_shorturlcreate_to_shorturlindb(
 
 def run_format_short_id(short_id_in: str):
     """
-    Convert the short id if it has s/ to be lowercase
+    Convert the short id if it has u/ to be lowercase
     """
 
     cleaned_short_id = short_id_in
 
-    if short_id_in.lower().startswith("s/"):
-        cleaned_short_id = "s/" + short_id_in[2:].lower()
+    if short_id_in.lower().startswith("u/"):
+        cleaned_short_id = "u/" + short_id_in[2:].lower()
 
     return cleaned_short_id
