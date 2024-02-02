@@ -142,6 +142,10 @@ def convert_shorturlcreate_to_shorturlindb(
     # Get timestamp
     current_timestamp = util.get_current_datetime()
 
+    cleaned_short_id = run_format_short_id(create_model.ShortId)
+
+    create_model.ShortId = cleaned_short_id
+
     indb_model = ShortUrlInDB(
         # Add shorturl create values
         **jsonable_encoder(create_model),
@@ -153,3 +157,16 @@ def convert_shorturlcreate_to_shorturlindb(
     )
 
     return indb_model
+
+
+def run_format_short_id(short_id_in: str):
+    """
+    Convert the short id if it has s/ to be lowercase
+    """
+
+    cleaned_short_id = short_id_in
+
+    if short_id_in.lower().startswith("s/"):
+        cleaned_short_id = "s/" + short_id_in[2:].lower()
+
+    return cleaned_short_id

@@ -2,7 +2,7 @@
 name = "kurteyt-url"
 version = "0.1.0"
 description = ""
-authors = ["dwbellisotn <dustinbellisotn@gmail.com>"]
+authors = ["dwbelliston <dustinbelliston@gmail.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.8"

@@ -39,7 +39,9 @@ class CRUDShortUrl(
 
         """
 
-        shorturl_in_db = self.read_item_by_pk(partition=short_id)
+        cleaned_short_id = models.run_format_short_id(short_id)
+
+        shorturl_in_db = self.read_item_by_pk(partition=cleaned_short_id)
 
         return shorturl_in_db
 
