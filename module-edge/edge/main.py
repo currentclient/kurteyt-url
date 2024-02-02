@@ -285,6 +285,7 @@ SUPPORTED_STATUS_CODES = {
     "307": "Temporary Redirect",
 }
 
+
 # Check its not an api route
 def check_is_apiroute(path):
     """Check its an api route or a redirectable slug"""
@@ -319,6 +320,8 @@ def get_redirect_record(slug):
 
     redirect_record = {}
 
+    cleaned_slug = run_format_short_id(slug)
+
     try:
 
         global RES_CONTACT_TABLE  # pylint: disable=global-statement
@@ -331,7 +334,7 @@ def get_redirect_record(slug):
         get_response = RES_CONTACT_TABLE.get_item(
             Key={
                 # PK and SK are on the record being passed in for updates
-                "PK": slug,
+                "PK": cleaned_slug,
             },
             ConsistentRead=False,  # True|False,
         )
@@ -447,6 +450,19 @@ def make_response(cloudfront_event):
         response = build_direct_redirect(response, redirect_record)
 
     return response
+
+
+def run_format_short_id(short_id_in: str):
+    """
+    Convert the short id if it has u/ to be lowercase
+    """
+
+    cleaned_short_id = short_id_in
+
+    if short_id_in.lower().startswith("u/"):
+        cleaned_short_id = "u/" + short_id_in[2:].lower()
+
+    return cleaned_short_id
 
 
 def handler(evt=None, ctx=None):
