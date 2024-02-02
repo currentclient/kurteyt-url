@@ -7,7 +7,7 @@
     "deploy": "serverless deploy --verbose --force --stage $TARGET_ENV",
     "package": "serverless package --verbose --force --stage $TARGET_ENV",
     "remove": "serverless remove --verbose --force --stage $TARGET_ENV",
-    "up": "docker-compose up --build --remove-orphan",
+    "up": "docker-compose up --build",
     "down": "docker-compose down",
     "box": "docker exec -it kurteyt-url_api_1 /bin/bash",
     "local:offline": "serverless offline",

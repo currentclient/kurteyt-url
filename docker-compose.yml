@@ -1,0 +1,24 @@
+version: "3.3"
+
+services:
+  api:
+    image: "api:${TAG-latest}"
+    ports:
+      - "8001:8001"
+      # Open debug port (match to ./vscode/launch.json config)
+      - "5858:5858"
+    volumes:
+      # Add our app to containers app/app, fastapi docker image checks for app there by default
+      # this then allows us to maintain just app dir when deployed to lambda
+      # https://github.com/tiangolo/uvicorn-gunicorn-fastapi-docker#module_name
+      - ./module-app/app:/app/app
+      # Add the dependencies to the app, will be referenced by Dockerfile
+      - ./pyproject.toml:/app/pyproject.toml
+      # Add host creds to container
+      - ~/.aws:/root/.aws
+    env_file:
+      - docker/.env.dev
+    build:
+      context: .
+    # Allows live reload
+    command: /start-reload.sh

@@ -1,6 +1,5 @@
 """ShortUrl API"""
 
-
 from typing import Any
 
 from fastapi import APIRouter, HTTPException, Path, status
@@ -34,7 +33,7 @@ def create_shorturl(
 
         return shorturl
 
-    except (exceptions.CreateRecordConditionFailed) as err:
+    except exceptions.CreateRecordConditionFailed as err:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail="Short url already exists",
@@ -71,6 +70,33 @@ def read_shorturl(
     return shorturl_in_db
 
 
+@router.get(
+    "/u/{id}",
+    response_model=models.ShortUrl,
+    responses=common_400_and_500,
+)
+def read_user_shorturl(
+    *,
+    short_id: str = Path(..., alias="id"),
+) -> Any:
+    """Get shorturl record for user defined urls"""
+    # Added this to suppor the s/ lookups
+    LOGGER.debug(
+        (
+            "Function: read_user_shorturl |",
+            f"short_id: {short_id}",
+        )
+    )
+
+    # Add back the u since it got pulled out with the params
+    full_user_id = f"u/{short_id}"
+
+    # Get shorturl
+    shorturl_in_db = _get_shorturl(short_id=full_user_id)
+
+    return shorturl_in_db
+
+
 @router.delete(
     "/{id}",
     response_model=models.ShortUrl,
@@ -96,7 +122,7 @@ def delete_shorturl(
     try:
         shorturl = crud.shorturl.delete(db_obj=shorturl_in_db)
 
-    except (exceptions.DeleteRecordFailed) as err:
+    except exceptions.DeleteRecordFailed as err:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=err.message
         )
