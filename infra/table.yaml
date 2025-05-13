@@ -19,8 +19,8 @@ Resources:
           KeyType: HASH
       # LocalSecondaryIndexes:
       #   - LocalSecondaryIndex
-      # PointInTimeRecoverySpecification:
-      #   PointInTimeRecoverySpecification
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
       # ProvisionedThroughput:
       #   ReadCapacityUnits: 1
       #   WriteCapacityUnits: 1
