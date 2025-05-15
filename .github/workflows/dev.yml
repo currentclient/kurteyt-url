@@ -17,14 +17,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Set up python
-        id: setup-python
+      - name: Setup python
         uses: actions/setup-python@v4
         with:
           python-version: "3.8"
 
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v2
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
