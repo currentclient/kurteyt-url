@@ -56,8 +56,8 @@ Resources:
       #   ReplicationConfiguration
       # Tags:
       #   - Tag
-      # VersioningConfiguration:
-      #   VersioningConfiguration
+      VersioningConfiguration:
+        Status: Enabled
       # WebsiteConfiguration:
       #   WebsiteConfiguration
 
