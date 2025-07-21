@@ -6,7 +6,7 @@ authors = ["dwbelliston <dustinbelliston@gmail.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.8"
-fastapi = "^0.63.0"
+fastapi = "^0.115.0"
 mangum = "^0.10.0"
 python-jose = "^3.2.0"
 requests = "^2.24.0"
