@@ -29,7 +29,7 @@ class PaginationCursor(BaseModel):
 
     last_evaluated_key: Dict[str, str]
     limit: int
-    projection_expression: Optional[str]
+    projection_expression: Optional[str] = None
 
     def encode(self):
         """Create pagination cursor for dyanamodb"""

@@ -18,9 +18,9 @@ class JWTAuthorizationCredentials(HTTPAuthorizationCredentials):
     """JWT credentials"""
 
     header: Dict[str, str]
-    claims: Dict[str, Union[str, List[str]]]
-    signature: Optional[str]
-    message: Optional[str]
+    claims: Dict[str, Union[str, List[str], int]]
+    signature: Optional[str] = None
+    message: Optional[str] = None
 
 
 class JWTBearer(HTTPBearer):

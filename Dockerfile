@@ -1,8 +1,5 @@
 # > Builds local fastapi app
-
-# https://github.com/tiangolo/uvicorn-gunicorn-fastapi-docker
-
-FROM tiangolo/uvicorn-gunicorn-fastapi:python3.8
+FROM python:3.12
 
 # Needs to be app to overrite default app from fastapi image
 WORKDIR /app/
