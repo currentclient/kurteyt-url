@@ -2,7 +2,7 @@
 
 from typing import List, Optional, Union
 
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel
 
 
 class UserBase(BaseModel):
@@ -14,7 +14,7 @@ class UserBase(BaseModel):
     and not have to require anything
     """
 
-    email: Optional[EmailStr] = None
+    email: Optional[str] = None
 
 
 class UserUpdate(UserBase):

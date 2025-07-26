@@ -2,7 +2,6 @@
 
 from typing import List, Optional
 
-from pydantic import EmailStr
 from pydantic_settings import BaseSettings
 
 
@@ -20,7 +19,7 @@ class Settings(BaseSettings):
     ]
 
     # Email
-    EMAILS_FROM_EMAIL: Optional[EmailStr] = None
+    EMAILS_FROM_EMAIL: Optional[str] = None
     EMAILS_FROM_NAME: Optional[str] = None
 
     class Config:

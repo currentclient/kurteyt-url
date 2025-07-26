@@ -11,32 +11,36 @@ on:
 
 env:
   TARGET_ENV: prd
+  SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
 
 jobs:
-  runit:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Set up python
-        id: setup-python
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.8"
-
-      - name: Checkout
+      - name: ⬇️ Checkout
         uses: actions/checkout@v3
 
+      - name: 👀 Env
+        run: |
+          echo "Env: ${{ env.TARGET_ENV }}"
+
+      - name: Setup python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"
+
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1-node16
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.PRD_AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.PRD_AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
-      - name: Install
+      - name: 📥 Install dependencies
         run: |
           npm install
 
-      - name: Deploy East
+      - name: 🚀 Deploy east
         run: |
           npm run deploy
