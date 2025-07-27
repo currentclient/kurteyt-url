@@ -4,7 +4,7 @@ import datetime
 import random
 import string
 from enum import Enum
-from typing import Optional
+from typing import Optional, Union
 
 from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel, HttpUrl
@@ -49,7 +49,7 @@ class ShortUrlBase(BaseModel):
     TargetUrl: Optional[HttpUrl] = None
     ShortId: Optional[str] = None
     NumDaysUntilExpire: Optional[int] = None
-    TTL: Optional[int] = None
+    TTL: Optional[Union[int, str]] = None
     OgSettings: Optional[OgSettings] = None
 
     @classmethod
