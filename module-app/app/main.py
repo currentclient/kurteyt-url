@@ -80,4 +80,4 @@ def read_items(request: Request):
 
 
 # Wrap in ASGI to deploy on lambda
-handler = Mangum(app, enable_lifespan=False, log_level="warning")
+handler = Mangum(app)

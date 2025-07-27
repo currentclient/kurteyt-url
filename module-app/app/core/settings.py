@@ -22,10 +22,5 @@ class Settings(BaseSettings):
     EMAILS_FROM_EMAIL: Optional[str] = None
     EMAILS_FROM_NAME: Optional[str] = None
 
-    class Config:
-        """Config"""
-
-        case_sensitive = True
-
 
 settings = Settings()

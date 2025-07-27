@@ -45,7 +45,7 @@ class ShortUrlBase(BaseModel):
     redirect to it.
     """
 
-    RedirectType: Optional[RedirectTypeEnum] = RedirectTypeEnum.DIRECT
+    RedirectType: Optional[RedirectTypeEnum] = RedirectTypeEnum.DIRECT.value
     TargetUrl: Optional[HttpUrl] = None
     ShortId: Optional[str] = None
     NumDaysUntilExpire: Optional[int] = None
@@ -68,7 +68,7 @@ class ShortUrlCreate(BaseModel):
     TargetUrl: HttpUrl
     ShortId: Optional[str] = None
     NumDaysUntilExpire: int = 90
-    RedirectType: Optional[RedirectTypeEnum] = RedirectTypeEnum.DIRECT
+    RedirectType: Optional[RedirectTypeEnum] = RedirectTypeEnum.DIRECT.value
     OgSettings: Optional[OgSettings] = None
 
 
