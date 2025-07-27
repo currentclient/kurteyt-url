@@ -137,7 +137,7 @@ def convert_shorturlcreate_to_shorturlindb(
     expire_datetime = datetime.datetime.today() + datetime.timedelta(
         days=create_model.NumDaysUntilExpire
     )
-    expire_ttl = expire_datetime.timestamp()
+    expire_ttl = int(expire_datetime.timestamp())
 
     # Get timestamp
     current_timestamp = util.get_current_datetime()
