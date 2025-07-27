@@ -2,7 +2,7 @@
 service: kurteyt-url
 
 # Pin framework version
-frameworkVersion: "3"
+frameworkVersion: "4"
 
 plugins:
   - serverless-python-requirements
@@ -67,7 +67,7 @@ provider:
   stage: ${opt:stage, 'dev'}
   stackName: ${param:stackName}
   stackTags: ${file(./tags.yml)}
-  runtime: python3.8
+  runtime: python3.12
   logRetentionInDays: 7
   timeout: 26 # HTTP api timeout is 29s
   memorySize: 128
