@@ -498,8 +498,10 @@ def record_click(short_id, meta):
         table = _get_clicks_table()
 
         pk = f"SHORTID#{short_id}"
-        now = datetime.datetime.utcnow().replace(tzinfo=datetime.timezone.utc)
-        timestamp = now.isoformat()
+        # tz-aware UTC at second precision: drives a correct epoch for TTL,
+        # while the stored string drops the tz suffix (db is always UTC).
+        now = datetime.datetime.now(datetime.timezone.utc).replace(microsecond=0)
+        timestamp = now.replace(tzinfo=None).isoformat()  # e.g. 2026-06-14T03:44:21
         now_seconds = int(now.timestamp())
 
         # Unique detection: conditional put of a seen-marker
