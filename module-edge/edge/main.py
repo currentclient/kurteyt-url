@@ -30,7 +30,7 @@ RES_CONTACT_TABLE = None
 # ---------------------------------------------------------------------------
 # Click analytics
 #
-# Clicks are written best-effort to the shorturl-clicks table owned by the
+# Clicks are written best-effort to the shared analytics table owned by the
 # cc-api-users stack (us-west-2). This is a cross-region write from the edge,
 # so we use tight timeouts and never let a failure block the redirect.
 #
@@ -41,10 +41,10 @@ RES_CONTACT_TABLE = None
 # an async path (emit a structured log line -> CloudWatch subscription ->
 # regional writer lambda) instead of writing inline here.
 # ---------------------------------------------------------------------------
-CLICKS_TABLE_NAME = None
-CLICKS_REGION = "us-west-2"
+ANALYTICS_TABLE_NAME = None
+ANALYTICS_REGION = "us-west-2"
 CLICKS_HASH_SALT = "cc-shorturl"  # keep in sync with cc-api-users util.get_ip_hash
-RES_CLICKS_TABLE = None
+RES_ANALYTICS_TABLE = None
 
 # Raw click events / seen-markers expire; counters are permanent
 CLICK_EVENT_TTL_DAYS = 180
@@ -469,19 +469,19 @@ def extract_click_metadata(request):
 
 def _get_clicks_table():
     """Lazily build the cross-region clicks table resource with tight timeouts"""
-    global RES_CLICKS_TABLE  # pylint: disable=global-statement
+    global RES_ANALYTICS_TABLE  # pylint: disable=global-statement
 
-    if RES_CLICKS_TABLE is None:
+    if RES_ANALYTICS_TABLE is None:
         config = Config(
             connect_timeout=0.2,
             read_timeout=0.3,
             retries={"max_attempts": 0},
         )
-        RES_CLICKS_TABLE = SESSION.resource(
-            service_name="dynamodb", region_name=CLICKS_REGION, config=config
-        ).Table(CLICKS_TABLE_NAME)
+        RES_ANALYTICS_TABLE = SESSION.resource(
+            service_name="dynamodb", region_name=ANALYTICS_REGION, config=config
+        ).Table(ANALYTICS_TABLE_NAME)
 
-    return RES_CLICKS_TABLE
+    return RES_ANALYTICS_TABLE
 
 
 def record_click(short_id, meta):
@@ -491,7 +491,7 @@ def record_click(short_id, meta):
     Writes a per-click event, flags unique vs repeat via a hashed-ip marker,
     and atomically bumps the running counters.
     """
-    if not CLICKS_TABLE_NAME:
+    if not ANALYTICS_TABLE_NAME:
         return
 
     try:
@@ -658,10 +658,10 @@ def handler_dev(evt=None, ctx=None):
     """dev env"""
     global KERTEYT_TABLE_NAME
     global EXPIRED_REDIRECT
-    global CLICKS_TABLE_NAME
+    global ANALYTICS_TABLE_NAME
     KERTEYT_TABLE_NAME = "cc-east-dev-db-kurteyt"
     EXPIRED_REDIRECT = "https://client.currentclient.io/expired"
-    CLICKS_TABLE_NAME = "cc-west-dev-db-shorturl-clicks"
+    ANALYTICS_TABLE_NAME = "cc-west-dev-db-analytics"
     return handler(evt, ctx)
 
 
@@ -669,8 +669,8 @@ def handler_prd(evt=None, ctx=None):
     """prd env"""
     global KERTEYT_TABLE_NAME
     global EXPIRED_REDIRECT
-    global CLICKS_TABLE_NAME
+    global ANALYTICS_TABLE_NAME
     KERTEYT_TABLE_NAME = "cc-east-prd-db-kurteyt"
     EXPIRED_REDIRECT = "https://client.currentclient.com/expired"
-    CLICKS_TABLE_NAME = "cc-west-prd-db-shorturl-clicks"
+    ANALYTICS_TABLE_NAME = "cc-west-prd-db-analytics"
     return handler(evt, ctx)
