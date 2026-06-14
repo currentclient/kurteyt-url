@@ -8,6 +8,8 @@ import datetime
 import hashlib
 import random
 import string
+from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import wait as futures_wait
 
 import boto3
 from botocore.config import Config
@@ -49,6 +51,11 @@ RES_ANALYTICS_TABLE = None
 # Raw click events / seen-markers expire; counters are permanent
 CLICK_EVENT_TTL_DAYS = 180
 SEEN_MARKER_TTL_DAYS = 30
+
+# Backstop cap on how long the two parallel writes may add to the redirect.
+# Each call is already bounded by the client connect/read timeouts; this is a
+# safety net so a hung write can never stall the redirect beyond this budget.
+ANALYTICS_WRITE_DEADLINE_SECONDS = 1.0
 
 # Setup logger
 LOGGER = logger.get_logger("index")
@@ -538,19 +545,34 @@ def record_click(short_id, meta):
             if meta.get(key):
                 event[key] = meta[key]
 
-        table.put_item(Item=event)
-
         # Atomic counters
         update_expression = "ADD ClickCount :one"
         values = {":one": 1}
         if is_unique:
             update_expression += ", UniqueCount :one"
 
-        table.update_item(
-            Key={"PK": pk, "SK": "COUNT"},
-            UpdateExpression=update_expression,
-            ExpressionAttributeValues=values,
-        )
+        def _put_event():
+            table.put_item(Item=event)
+
+        def _bump_counters():
+            table.update_item(
+                Key={"PK": pk, "SK": "COUNT"},
+                UpdateExpression=update_expression,
+                ExpressionAttributeValues=values,
+            )
+
+        # The event write and the counter bump are independent, so run them
+        # concurrently: the redirect waits on the slower of the two (~1
+        # cross-region round trip) instead of both in series. boto3 releases the
+        # GIL during the socket calls, so the two genuinely overlap. The overall
+        # wait is capped as a backstop; threads are not joined on shutdown so a
+        # slow write can never hold the redirect past the deadline.
+        pool = ThreadPoolExecutor(max_workers=2)
+        try:
+            futures = [pool.submit(_put_event), pool.submit(_bump_counters)]
+            futures_wait(futures, timeout=ANALYTICS_WRITE_DEADLINE_SECONDS)
+        finally:
+            pool.shutdown(wait=False)
 
     except Exception as err:  # pylint: disable=broad-except
         LOGGER.info(f"record_click failed (non-fatal): {err}")
