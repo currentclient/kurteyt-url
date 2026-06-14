@@ -4,7 +4,14 @@ Lambda@edge
 If not an api route, check url slug and redirect based on record in dynamodb
 """
 
+import datetime
+import hashlib
+import random
+import string
+
 import boto3
+from botocore.config import Config
+from boto3.dynamodb.conditions import Attr
 from edge import logger
 
 LOGGER = logger.get_logger(__name__)
@@ -19,6 +26,29 @@ EXPIRED_REDIRECT = None
 
 # Lazy init cli
 RES_CONTACT_TABLE = None
+
+# ---------------------------------------------------------------------------
+# Click analytics
+#
+# Clicks are written best-effort to the shorturl-clicks table owned by the
+# cc-api-users stack (us-west-2). This is a cross-region write from the edge,
+# so we use tight timeouts and never let a failure block the redirect.
+#
+# Set per-env in handler_dev / handler_prd (Lambda@Edge cannot use env vars).
+#
+# NOTE (tradeoff): this is a synchronous write on the redirect hot path. It is
+# acceptable for the current low link volume. If latency/volume grows, move to
+# an async path (emit a structured log line -> CloudWatch subscription ->
+# regional writer lambda) instead of writing inline here.
+# ---------------------------------------------------------------------------
+CLICKS_TABLE_NAME = None
+CLICKS_REGION = "us-west-2"
+CLICKS_HASH_SALT = "cc-shorturl"  # keep in sync with cc-api-users util.get_ip_hash
+RES_CLICKS_TABLE = None
+
+# Raw click events / seen-markers expire; counters are permanent
+CLICK_EVENT_TTL_DAYS = 180
+SEEN_MARKER_TTL_DAYS = 30
 
 # Setup logger
 LOGGER = logger.get_logger("index")
@@ -403,6 +433,127 @@ def build_direct_redirect(response, redirect_record, status_code="301"):
     return response
 
 
+def _get_header_value(headers, name):
+    """Pull a single header value from the cloudfront headers structure"""
+    try:
+        return headers.get(name, [{}])[0].get("value")
+    except Exception:  # pylint: disable=broad-except
+        return None
+
+
+def hash_ip(ip):
+    """Hash a viewer ip for unique tracking. Never store the raw ip."""
+    if not ip:
+        return None
+
+    digest = hashlib.sha256(f"{CLICKS_HASH_SALT}:{ip}".encode("utf-8")).hexdigest()
+    return digest[:16]
+
+
+def extract_click_metadata(request):
+    """Capture click metadata from a cloudfront viewer request"""
+
+    headers = request.get("headers", {})
+
+    # clientIp is always present on the cloudfront viewer-request event
+    client_ip = request.get("clientIp")
+
+    return {
+        "Referrer": _get_header_value(headers, "referer"),
+        "UserAgent": _get_header_value(headers, "user-agent"),
+        # Best-effort: present only if the viewer-country header is forwarded
+        "Country": _get_header_value(headers, "cloudfront-viewer-country"),
+        "IpHash": hash_ip(client_ip),
+    }
+
+
+def _get_clicks_table():
+    """Lazily build the cross-region clicks table resource with tight timeouts"""
+    global RES_CLICKS_TABLE  # pylint: disable=global-statement
+
+    if RES_CLICKS_TABLE is None:
+        config = Config(
+            connect_timeout=0.2,
+            read_timeout=0.3,
+            retries={"max_attempts": 0},
+        )
+        RES_CLICKS_TABLE = SESSION.resource(
+            service_name="dynamodb", region_name=CLICKS_REGION, config=config
+        ).Table(CLICKS_TABLE_NAME)
+
+    return RES_CLICKS_TABLE
+
+
+def record_click(short_id, meta):
+    """
+    Best-effort write of a click. Must never raise (would block the redirect).
+
+    Writes a per-click event, flags unique vs repeat via a hashed-ip marker,
+    and atomically bumps the running counters.
+    """
+    if not CLICKS_TABLE_NAME:
+        return
+
+    try:
+        table = _get_clicks_table()
+
+        pk = f"SHORTID#{short_id}"
+        now = datetime.datetime.utcnow().replace(tzinfo=datetime.timezone.utc)
+        timestamp = now.isoformat()
+        now_seconds = int(now.timestamp())
+
+        # Unique detection: conditional put of a seen-marker
+        is_unique = True
+        ip_hash = meta.get("IpHash")
+        if ip_hash:
+            seen_ttl = now_seconds + SEEN_MARKER_TTL_DAYS * 24 * 60 * 60
+            try:
+                table.put_item(
+                    Item={
+                        "PK": pk,
+                        "SK": f"SEEN#{ip_hash}",
+                        "TYPE": "SHORTURLSEEN",
+                        "TTL": seen_ttl,
+                    },
+                    ConditionExpression=Attr("PK").not_exists(),
+                )
+            except Exception:  # pylint: disable=broad-except
+                # Marker already exists -> repeat visitor
+                is_unique = False
+
+        # Per-click event record
+        suffix = "".join(random.choice(string.ascii_lowercase + string.digits) for _ in range(6))
+        event = {
+            "PK": pk,
+            "SK": f"CLICK#{timestamp}#{suffix}",
+            "TYPE": "SHORTURLCLICK",
+            "ShortId": short_id,
+            "Timestamp": timestamp,
+            "IsUnique": is_unique,
+            "TTL": now_seconds + CLICK_EVENT_TTL_DAYS * 24 * 60 * 60,
+        }
+        for key in ("Referrer", "UserAgent", "Country", "IpHash"):
+            if meta.get(key):
+                event[key] = meta[key]
+
+        table.put_item(Item=event)
+
+        # Atomic counters
+        update_expression = "ADD ClickCount :one"
+        values = {":one": 1}
+        if is_unique:
+            update_expression += ", UniqueCount :one"
+
+        table.update_item(
+            Key={"PK": pk, "SK": "COUNT"},
+            UpdateExpression=update_expression,
+            ExpressionAttributeValues=values,
+        )
+
+    except Exception as err:  # pylint: disable=broad-except
+        LOGGER.info(f"record_click failed (non-fatal): {err}")
+
+
 def make_response(cloudfront_event):
     """Check the request and determine response"""
 
@@ -431,6 +582,18 @@ def make_response(cloudfront_event):
     if not redirect_record:
         LOGGER.info("Forward to API, no redirect recorded")
         redirect_record = {"TargetUrl": EXPIRED_REDIRECT}
+    else:
+        # Real redirect -> record a click. Use the cleaned slug so the analytics
+        # key matches the ShortId the library stores (e.g. "u/meeting").
+        # Guard the whole call site (incl. metadata extraction) so analytics can
+        # never break a redirect, regardless of future changes to those helpers.
+        try:
+            record_click(
+                short_id=run_format_short_id(requested_slug),
+                meta=extract_click_metadata(request),
+            )
+        except Exception as err:  # pylint: disable=broad-except
+            LOGGER.info(f"click capture failed (non-fatal): {err}")
 
     # Find target URL
     redirect_type = redirect_record.get("RedirectType")
@@ -493,8 +656,10 @@ def handler_dev(evt=None, ctx=None):
     """dev env"""
     global KERTEYT_TABLE_NAME
     global EXPIRED_REDIRECT
+    global CLICKS_TABLE_NAME
     KERTEYT_TABLE_NAME = "cc-east-dev-db-kurteyt"
     EXPIRED_REDIRECT = "https://client.currentclient.io/expired"
+    CLICKS_TABLE_NAME = "cc-west-dev-db-shorturl-clicks"
     return handler(evt, ctx)
 
 
@@ -502,6 +667,8 @@ def handler_prd(evt=None, ctx=None):
     """prd env"""
     global KERTEYT_TABLE_NAME
     global EXPIRED_REDIRECT
+    global CLICKS_TABLE_NAME
     KERTEYT_TABLE_NAME = "cc-east-prd-db-kurteyt"
     EXPIRED_REDIRECT = "https://client.currentclient.com/expired"
+    CLICKS_TABLE_NAME = "cc-west-prd-db-shorturl-clicks"
     return handler(evt, ctx)
