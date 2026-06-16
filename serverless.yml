@@ -24,6 +24,8 @@ params:
   default:
     cognitoUserPoolGroupUsersId: users
     cognitoUserPoolGroupGovernorId: governors
+    # WAF WebACL ARN — prd uses cc-global-prd-cloudfront; dev has no WAF
+    webAclArn: ""
     # Name of the cloudformation stack
     stackName: cc-east-${self:provider.stage}-stack-kurteyt
     # Name of the api
@@ -41,6 +43,7 @@ params:
 
   prd:
     edgeHandler: edge.main.handler_prd
+    webAclArn: "arn:aws:wafv2:us-east-1:288020343544:global/webacl/cc-global-prd-cloudfront/50945332-f292-4cae-9e97-11aee07449d6"
     cognitoUserPoolClientsWeb: 26mf5j64glf9ri02fmpjqqgkhk
     cognitoUserPoolClientsServices: 3m83rvmir1a7qo8npivnci89a1
     cognitoUserPoolClientsInternal: ldnr04o1efig1kbbu2kgdfj84
