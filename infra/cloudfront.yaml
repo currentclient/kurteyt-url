@@ -4,6 +4,10 @@
 ####      - Cloudfront distribution
 #############################################################################
 
+Conditions:
+  # True only when a non-empty WAF ARN is provided (prd stage)
+  HasWebAcl: !Not [!Equals ["${param:webAclArn}", ""]]
+
 Resources:
   # ---------------------------------------------------------------------------
   # Bucket to receive cloudfront logs
@@ -205,4 +209,7 @@ Resources:
           AcmCertificateArn: ${param:domainNameCertArn}
           MinimumProtocolVersion: TLSv1.2_2019
           SslSupportMethod: sni-only
-        # WebACLId: String
+        WebACLId: !If
+          - HasWebAcl
+          - "${param:webAclArn}"
+          - !Ref "AWS::NoValue"
