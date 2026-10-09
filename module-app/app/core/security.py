@@ -4,8 +4,7 @@ from typing import Dict, List, Optional, Union
 
 from fastapi import HTTPException
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-import jwt
-from jwt import PyJWTError
+from jose import JWTError, jwt
 from starlette.requests import Request
 from starlette.status import HTTP_403_FORBIDDEN
 
@@ -58,7 +57,7 @@ class JWTBearer(HTTPBearer):
                     scheme=credentials.scheme,
                     credentials=credentials.credentials,
                     header=jwt.get_unverified_header(jwt_token),
-                    claims=jwt.decode(jwt_token, options={"verify_signature": False}),
+                    claims=jwt.get_unverified_claims(jwt_token),
                     # signature=signature,
                     # message=message,
                 )
@@ -67,7 +66,7 @@ class JWTBearer(HTTPBearer):
                 LOGGER.exception(err)
                 raise exceptions.NoCredentialsError()
 
-        except PyJWTError as err:
+        except JWTError as err:
             LOGGER.exception(err)
             raise HTTPException(
                 status_code=HTTP_403_FORBIDDEN, detail="Invalid credentials"
